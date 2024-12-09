@@ -11,10 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('carts', function (Blueprint $table) {
-            $table->uuid('id')->primary();
-            $table->json('items');
-            $table->timestamps();
+        Schema::create('carts', function (Blueprint $blueprint): void {
+            $blueprint->uuid('id')->primary();
+            $blueprint->json('items');
+            $blueprint->timestamps();
         });
     }
 

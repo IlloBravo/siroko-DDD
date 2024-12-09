@@ -14,12 +14,7 @@ readonly class CheckoutCartUseCase
      */
     public function execute(string $cartId): void
     {
-        $cart = $this->cartRepository->findById($cartId);
-
-        if (!$cart) {
-            throw new Exception("Cart not found.");
-        }
-
+        $cart = $this->cartRepository->findByIdOrFail($cartId);
         $cart->checkout();
         $this->cartRepository->save($cart);
     }

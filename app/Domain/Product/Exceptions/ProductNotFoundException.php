@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Domain\Cart\Exceptions;
+namespace App\Domain\Product\Exceptions;
 
 use RuntimeException;
 
-class CartNotFoundException extends RuntimeException
+class ProductNotFoundException extends RuntimeException
 {
-    public function __construct(string $cartId)
+    public function __construct(string $productId)
     {
-        parent::__construct("Cart with ID {$cartId} not found.");
+        parent::__construct("Product with ID {$productId} not found.");
     }
 }

@@ -3,17 +3,31 @@
 namespace App\Domain\Cart;
 
 use App\Domain\Product\Product;
+use DateMalformedStringException;
 use DateTime;
 use Illuminate\Support\Collection;
 
-class Cart
+final class Cart
 {
     public function __construct(
-        public string $id,
+        public readonly string $id,
         public Collection $items,
-        public DateTime $createdAt,
+        public readonly DateTime $createdAt,
         public DateTime $updatedAt
     ) {}
+
+    /**
+     * @throws DateMalformedStringException
+     */
+    public static function fromArray(object $cartData, Collection $items, DateTime $createdAt, DateTime $updatedAt): self
+    {
+        return new self(
+            $cartData->id,
+            $items,
+            new DateTime($createdAt),
+            new DateTime($updatedAt)
+        );
+    }
 
     // Añadir un producto al carrito
     public function addProduct(Product $product): void
@@ -37,7 +51,7 @@ class Cart
     // Eliminar un producto del carrito
     public function removeProduct(string $productId): void
     {
-        $this->items = $this->items->reject(fn($item) => $item->id === $productId);
+        $this->items = $this->items->reject(fn($item): bool => $item->id === $productId);
         $this->updatedAt = new DateTime();
     }
 

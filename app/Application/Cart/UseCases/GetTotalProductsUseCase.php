@@ -14,12 +14,7 @@ readonly class GetTotalProductsUseCase
      */
     public function execute(string $cartId): int
     {
-        $cart = $this->cartRepository->findById($cartId);
-
-        if (!$cart) {
-            throw new Exception("Cart not found.");
-        }
-
+        $cart = $this->cartRepository->findByIdOrFail($cartId);
         return $cart->getTotalProducts();
     }
 }

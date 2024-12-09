@@ -14,12 +14,7 @@ readonly class RemoveProductFromCartUseCase
      */
     public function execute(string $cartId, string $productId): void
     {
-        $cart = $this->cartRepository->findById($cartId);
-
-        if (!$cart) {
-            throw new Exception("Cart not found.");
-        }
-
+        $cart = $this->cartRepository->findByIdOrFail($cartId);
         $cart->removeProduct($productId);
         $this->cartRepository->save($cart);
     }

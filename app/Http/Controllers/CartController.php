@@ -27,12 +27,12 @@ class CartController extends Controller
      */
     public function addProduct(Request $request, string $cartId): JsonResponse
     {
-        $product = new Product(
+        $product =  Product::fromArray([
             $request->input('id'),
             $request->input('name'),
             $request->input('price'),
             $request->input('quantity')
-        );
+        ]);
 
         $this->addProductToCartUseCase->execute($cartId, $product);
 

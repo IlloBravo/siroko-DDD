@@ -3,6 +3,7 @@
 namespace App\Infrastructure\Repositories;
 
 use App\Domain\Cart\Cart;
+use App\Domain\Cart\Exceptions\CartNotFoundException;
 use App\Domain\Cart\Repository\CartRepositoryInterface;
 use App\Domain\Product\Product;
 use DateMalformedStringException;
@@ -26,24 +27,24 @@ class EloquentCartRepository implements CartRepositoryInterface
     /**
      * @throws DateMalformedStringException
      */
-    public function findById(string $id): ?Cart
+    public function findByIdOrFail(string $id): Cart
     {
         $cartData = DB::table('carts')->where('id', $id)->first();
 
         if (!$cartData) {
-            return null;
+            throw new CartNotFoundException($id);
         }
 
-        $items = collect(json_decode($cartData->items, true))->map(function ($item) {
-            return new Product(
+        $items = collect(json_decode($cartData->items, true))->map(function (array $item): Product {
+            return Product::fromArray([
                 $item['id'],
                 $item['name'],
                 $item['price'],
                 $item['quantity']
-            );
+            ]);
         });
 
-        return new Cart(
+        return Cart::fromArray(
             $cartData->id,
             $items,
             new DateTime($cartData->created_at),
