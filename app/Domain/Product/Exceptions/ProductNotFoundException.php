@@ -8,6 +8,7 @@ class ProductNotFoundException extends RuntimeException
 {
     public function __construct(string $productId)
     {
-        parent::__construct("Product with ID {$productId} not found.");
+        $message = __('product.product_not_found', ['id' => $productId]);
+        parent::__construct($message);
     }
 }
