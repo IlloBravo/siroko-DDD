@@ -4,7 +4,7 @@ namespace App\Domain\Product;
 
 use App\Domain\Shared\ValueObjects\UuidVO;
 
-class Product
+final class Product
 {
     public function __construct(
         public UuidVO $id,

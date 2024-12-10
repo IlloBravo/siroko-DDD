@@ -3,17 +3,28 @@
 namespace App\Domain\Cart;
 
 use App\Domain\Product\Product;
+use App\Domain\Shared\ValueObjects\UuidVO;
 use DateTime;
 use Illuminate\Support\Collection;
 
-class Cart
+final class Cart
 {
     public function __construct(
-        public string $id,
+        public UuidVO $id,
         public Collection $items,
         public DateTime $createdAt,
         public DateTime $updatedAt
     ) {}
+
+    public static function create(array $data): self
+    {
+        return new self(
+            UuidVO::fromString($data['id']),
+            $data['items'],
+            $data['created_at'],
+            $data['updated_at']
+        );
+    }
 
     public function addProduct(Product $product): void
     {
