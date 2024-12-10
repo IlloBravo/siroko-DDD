@@ -27,7 +27,7 @@ class CartController extends Controller
      */
     public function addProduct(Request $request, string $cartId): JsonResponse
     {
-        $product =  Product::fromArray([
+        $product = Product::fromArray([
             $request->input('id'),
             $request->input('name'),
             $request->input('price'),
@@ -36,7 +36,9 @@ class CartController extends Controller
 
         $this->addProductToCartUseCase->execute($cartId, $product);
 
-        return response()->json(['message' => 'Product added to cart']);
+        return response()->json([
+            'message' => __('cart.product_added', ['name' => $product->name])
+        ]);
     }
 
     /**
@@ -44,19 +46,30 @@ class CartController extends Controller
      */
     public function updateProduct(Request $request, string $cartId, string $productId): JsonResponse
     {
-        $this->updateProductQuantityUseCase->execute($cartId, $productId, $request->input('quantity'));
+        $this->updateProductQuantityUseCase->execute(
+            $cartId,
+            $productId,
+            $request->input('quantity')
+        );
 
-        return response()->json(['message' => 'Product quantity updated']);
+        return response()->json([
+            'message' => __('cart.product_updated', [
+                'name' => $request->input('name'),
+                'quantity' => $request->input('quantity')
+            ])
+        ]);
     }
 
     /**
      * @throws Exception
      */
-    public function removeProduct(string $cartId, string $productId): JsonResponse
+    public function removeProduct(Request $request, string $cartId, string $productId): JsonResponse
     {
         $this->removeProductFromCartUseCase->execute($cartId, $productId);
 
-        return response()->json(['message' => 'Product removed from cart']);
+        return response()->json([
+            'message' => __('cart.product_removed', ['name' => $request->input('name')])
+        ]);
     }
 
     /**
@@ -76,6 +89,8 @@ class CartController extends Controller
     {
         $this->checkoutCartUseCase->execute($cartId);
 
-        return response()->json(['message' => 'Cart checked out successfully']);
+        return response()->json([
+            'message' => __('cart.cart_checked_out')
+        ]);
     }
 }
