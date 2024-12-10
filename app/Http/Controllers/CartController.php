@@ -53,7 +53,6 @@ class CartController extends Controller
 
         return response()->json([
             'message' => __('Cart.product_updated', [
-                'name' => $request->input('name'),
                 'quantity' => $request->input('quantity')
             ])
         ]);
@@ -62,12 +61,12 @@ class CartController extends Controller
     /**
      * @throws CartNotFoundException
      */
-    public function removeProduct(Request $request, string $cartId, string $productId): JsonResponse
+    public function removeProduct(string $cartId, string $productId): JsonResponse
     {
         $this->removeProductFromCartUseCase->execute($cartId, $productId);
 
         return response()->json([
-            'message' => __('Cart.product_removed', ['name' => $request->input('name')])
+            'message' => __('Cart.product_removed')
         ]);
     }
 
