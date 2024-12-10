@@ -19,7 +19,7 @@ class Product
             UuidVO::fromString($data['id']),
             $data['name'],
             $data['price'],
-            $data['stock']
+            $data['quantity']
         );
     }
 }
