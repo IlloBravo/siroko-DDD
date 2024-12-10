@@ -3,10 +3,10 @@
 namespace App\Infrastructure\Repositories;
 
 use App\Domain\Cart\Cart;
+use App\Domain\Cart\Exceptions\CartNotFoundException;
 use App\Domain\Cart\Repository\CartRepositoryInterface;
-use App\Domain\Product\Product;
+use App\Domain\Shared\ValueObjects\UuidVO;
 use DateMalformedStringException;
-use DateTime;
 use Illuminate\Support\Facades\DB;
 
 class EloquentCartRepository implements CartRepositoryInterface
@@ -17,8 +17,8 @@ class EloquentCartRepository implements CartRepositoryInterface
             ['id' => $cart->id],
             [
                 'items' => json_encode($cart->items),
-                'created_at' => $cart->createdAt,
-                'updated_at' => $cart->updatedAt,
+                'created_at' => $cart->createdAt->format('Y-m-d H:i:s'),
+                'updated_at' => $cart->updatedAt->format('Y-m-d H:i:s'),
             ]
         );
     }
@@ -26,29 +26,17 @@ class EloquentCartRepository implements CartRepositoryInterface
     /**
      * @throws DateMalformedStringException
      */
-    public function findByIdOrFail(string $id): ?Cart
+    public function findByIdOrFail(string $id): Cart
     {
-        $cartData = DB::table('carts')->where('id', $id)->first();
+        $uuid = UuidVO::fromString($id);
+
+        $cartData = DB::table('carts')->where('id', $uuid)->first();
 
         if (!$cartData) {
-            return null;
+            throw new CartNotFoundException($id);
         }
 
-        $items = collect(json_decode($cartData->items, true))->map(function ($item) {
-            return new Product(
-                $item['id'],
-                $item['name'],
-                $item['price'],
-                $item['quantity']
-            );
-        });
-
-        return new Cart(
-            $cartData->id,
-            $items,
-            new DateTime($cartData->created_at),
-            new DateTime($cartData->updated_at)
-        );
+        return Cart::fromDatabase($cartData);
     }
 
     public function delete(string $id): void

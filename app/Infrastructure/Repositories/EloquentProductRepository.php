@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\DB;
 
 class EloquentProductRepository implements ProductRepositoryInterface
 {
-    public function findByIdOrFail(string $id): ?Product
+    public function findByIdOrFail(string $id): Product
     {
         $uuid = UuidVO::fromString($id);
 
@@ -20,6 +20,6 @@ class EloquentProductRepository implements ProductRepositoryInterface
             throw new ProductNotFoundException($id);
         }
 
-        return Product::create((array) $productData);
+        return Product::fromDatabase($productData);
     }
 }

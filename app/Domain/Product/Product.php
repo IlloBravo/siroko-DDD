@@ -22,4 +22,14 @@ final class Product
             $data['quantity']
         );
     }
+
+    public static function fromDatabase(object $data): self
+    {
+        return new self(
+            UuidVO::fromString($data->id),
+            $data->name,
+            $data->price,
+            $data->quantity
+        );
+    }
 }

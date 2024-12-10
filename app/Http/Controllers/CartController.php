@@ -7,7 +7,10 @@ use App\Application\Cart\UseCases\UpdateProductQuantityUseCase;
 use App\Application\Cart\UseCases\RemoveProductFromCartUseCase;
 use App\Application\Cart\UseCases\GetTotalProductsUseCase;
 use App\Application\Cart\UseCases\CheckoutCartUseCase;
-use App\Domain\Product\Product;
+use App\Domain\Cart\Exceptions\CartNotFoundException;
+use App\Domain\Cart\Repository\CartRepositoryInterface;
+use App\Domain\Product\Exceptions\ProductNotFoundException;
+use App\Domain\Product\Repository\ProductRepositoryInterface;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
@@ -19,22 +22,25 @@ class CartController extends Controller
         private readonly UpdateProductQuantityUseCase $updateProductQuantityUseCase,
         private readonly RemoveProductFromCartUseCase $removeProductFromCartUseCase,
         private readonly GetTotalProductsUseCase      $getTotalProductsUseCase,
-        private readonly CheckoutCartUseCase          $checkoutCartUseCase
+        private readonly CheckoutCartUseCase          $checkoutCartUseCase,
+        private readonly ProductRepositoryInterface   $productRepository,
+        private readonly CartRepositoryInterface      $cartRepository
     ) {}
 
     /**
-     * @throws Exception
+     * @throws ProductNotFoundException
+     * @throws CartNotFoundException
      */
-    public function addProduct(Request $request, string $cartId): JsonResponse
+    public function addProduct(Request $request): JsonResponse
     {
-        $product = new Product(
-            $request->input('id'),
-            $request->input('name'),
-            $request->input('price'),
+        $product = $this->productRepository->findByIdOrFail($request->input('id'));
+        $cart = $this->cartRepository->findByIdOrFail($request->input('cart_id'));
+
+        $this->addProductToCartUseCase->execute(
+            $cart,
+            $product,
             $request->input('quantity')
         );
-
-        $this->addProductToCartUseCase->execute($cartId, $product);
 
         return response()->json([
             'message' => __('Cart.products_added')

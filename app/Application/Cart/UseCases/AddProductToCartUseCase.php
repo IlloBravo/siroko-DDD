@@ -2,6 +2,7 @@
 
 namespace App\Application\Cart\UseCases;
 
+use App\Domain\Cart\Cart;
 use App\Domain\Cart\Exceptions\CartNotFoundException;
 use App\Domain\Cart\Repository\CartRepositoryInterface;
 use App\Domain\Product\Product;
@@ -13,10 +14,9 @@ readonly class AddProductToCartUseCase
     /**
      * @throws CartNotFoundException
      */
-    public function execute(string $cartId, Product $product): void
+    public function execute(Cart $cart, Product $product, int $quantity): void
     {
-        $cart = $this->cartRepository->findByIdOrFail($cartId);
-        $cart->addProduct($product);
+        $cart->addProduct($product, $quantity);
         $this->cartRepository->save($cart);
     }
 }
