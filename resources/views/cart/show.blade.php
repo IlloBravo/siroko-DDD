@@ -1,33 +1,33 @@
 @extends('layouts.app')
 
 @section('content')
-    <h1>{{ __('cart.your_cart') }}</h1>
+    <h1>{{ __('Cart.your_cart') }}</h1>
 
     <table class="table table-striped">
         <thead>
         <tr>
-            <th>{{ __('cart.product_name') }}</th>
-            <th>{{ __('cart.quantity') }}</th>
-            <th>{{ __('cart.actions') }}</th>
+            <th>{{ __('Cart.product_name') }}</th>
+            <th>{{ __('Cart.quantity') }}</th>
+            <th>{{ __('Cart.actions') }}</th>
         </tr>
         </thead>
         <tbody>
-        @foreach ($cart->items as $item)
+        @foreach ($cart->items as $product)
             <tr>
-                <td>{{ $item->product->name }}</td>
+                <td>{{ $product->name }}</td>
                 <td>
-                    <form action="{{ route('cart.updateProduct', ['cartId' => $cart->id, 'productId' => $item->product->id]) }}" method="POST" class="d-inline">
+                    <form action="{{ url('api/cart/' . $cart->id . '/products/' . $product->id) }}" method="POST" class="d-inline">
                         @csrf
                         @method('PUT')
-                        <input type="number" name="quantity" value="{{ $item->quantity }}" min="1" class="form-control d-inline w-25">
-                        <button type="submit" class="btn btn-primary btn-sm">{{ __('cart.update') }}</button>
+                        <input type="number" name="quantity" value="{{ $product->quantity }}" min="1" class="form-control d-inline w-25">
+                        <button type="submit" class="btn btn-primary btn-sm">{{ __('Cart.update') }}</button>
                     </form>
                 </td>
                 <td>
-                    <form action="{{ route('cart.removeProduct', ['cartId' => $cart->id, 'productId' => $item->product->id]) }}" method="POST" class="d-inline">
+                    <form action="{{ url('api/cart/' . $cart->id . '/products/' . $product->id) }}" method="POST" class="d-inline">
                         @csrf
                         @method('DELETE')
-                        <button type="submit" class="btn btn-danger btn-sm">{{ __('cart.remove') }}</button>
+                        <button type="submit" class="btn btn-danger btn-sm">{{ __('Cart.remove') }}</button>
                     </form>
                 </td>
             </tr>
@@ -35,8 +35,11 @@
         </tbody>
     </table>
 
-    <form action="{{ route('cart.checkout', ['cartId' => $cart->id]) }}" method="POST">
+    <form action="{{ url('api/cart/' . $cart->id . '/checkout') }}" method="POST">
         @csrf
-        <button type="submit" class="btn btn-success">{{ __('cart.checkout') }}</button>
+        <button type="submit" class="btn btn-success">{{ __('Cart.checkout') }}</button>
     </form>
+
+    <a href="{{ url('/products') }}" class="btn btn-secondary mt-3">{{ __('Cart.go_to_products') }}</a>
+
 @endsection

@@ -27,4 +27,13 @@ class EloquentProductRepository implements ProductRepositoryInterface
             ->where('id', (string) $productId)
             ->decrement('quantity', $quantity);
     }
+
+    public function findAll(): array
+    {
+        $productsData = DB::table('products')->get();
+
+        return $productsData->map(function ($productData) {
+            return Product::fromDatabase($productData);
+        })->toArray();
+    }
 }

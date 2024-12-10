@@ -12,4 +12,5 @@ interface ProductRepositoryInterface
      * @throws ProductNotFoundException
      */
     public function findByIdOrFail(UuidVO $id): Product;
+    public function findAll(): array;
 }

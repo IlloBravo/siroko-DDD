@@ -12,6 +12,7 @@ interface CartRepositoryInterface
      * @throws CartNotFoundException
      */
     public function findByIdOrFail(UuidVO $id): Cart;
+    public function findAll(): array;
     public function save(Cart $cart): void;
     public function delete(string $id): void;
 }

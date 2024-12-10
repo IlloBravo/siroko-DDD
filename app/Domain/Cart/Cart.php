@@ -39,7 +39,9 @@ final class Cart
     {
         return new self(
             UuidVO::fromString($data->id),
-            collect(json_decode($data->items, true)),
+            collect(json_decode($data->items, true))->map(
+                fn($item) => Product::fromDatabase((object) $item)
+            ),
             new DateTime($data->created_at),
             new DateTime($data->updated_at)
         );

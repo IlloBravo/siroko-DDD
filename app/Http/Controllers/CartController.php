@@ -15,6 +15,7 @@ use App\Domain\Shared\ValueObjects\UuidVO;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\View\View;
 
 class CartController extends Controller
 {
@@ -102,4 +103,17 @@ class CartController extends Controller
             'message' => __('Cart.cart_checked_out')
         ]);
     }
+
+    public function show(string $cartId): View
+    {
+        $cart = $this->cartRepository->findByIdOrFail(UuidVO::fromString($cartId));
+/*        dd($cart);*/
+        return view('cart.show', compact('cart'));
+    }
+
+    public function thankYou(): View
+    {
+        return view('cart.thankyou');
+    }
+
 }

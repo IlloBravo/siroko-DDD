@@ -1,6 +1,11 @@
 <?php
 
 return [
+    'cart_id' => 'Cart ID',
+    'created_at' => 'Created at',
+    'updated_at' => 'Updated at',
+    'view_cart' => 'Watch Cart',
+    'available_carts' => 'Available Carts',
     'products_added' => 'Products added to cart successfully',
     'product_updated' => 'Product quantity updated to :quantity',
     'product_removed' => 'Product removed from cart',
@@ -12,6 +17,7 @@ return [
     'price' => 'Price',
     'stock' => 'Stock',
     'quantity' => 'Quantity',
+    'amount_to_build' => 'How much?',
     'actions' => 'Actions',
     'add_to_cart' => 'Add to Cart',
     'update' => 'Update',
@@ -20,4 +26,5 @@ return [
     'thank_you' => 'Thank You!',
     'order_success' => 'Your order has been placed successfully.',
     'continue_shopping' => 'Continue Shopping',
+    'go_to_products' => 'Go To Products',
 ];

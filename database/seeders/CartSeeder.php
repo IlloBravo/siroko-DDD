@@ -14,13 +14,51 @@ class CartSeeder extends Seeder
      */
     public function run(): void
     {
-        $cart = [
-            'id' => (string) Str::uuid(),
-            'items' => json_encode([]),
-            'created_at' => new DateTime(),
-            'updated_at' => new DateTime(),
+        $productsCart1 = [
+            [
+                'id' => (string) Str::uuid(),
+                'name' => 'Gafas de Sol',
+                'price' => 49.99,
+                'quantity' => 2,
+            ],
+            [
+                'id' => (string) Str::uuid(),
+                'name' => 'Chaqueta de Cuero',
+                'price' => 129.99,
+                'quantity' => 1,
+            ],
         ];
 
-        DB::table('carts')->insert($cart);
+        $productsCart2 = [
+            [
+                'id' => (string) Str::uuid(),
+                'name' => 'Zapatillas Deportivas',
+                'price' => 89.99,
+                'quantity' => 1,
+            ],
+            [
+                'id' => (string) Str::uuid(),
+                'name' => 'Camiseta Básica',
+                'price' => 19.99,
+                'quantity' => 3,
+            ],
+        ];
+
+        $carts = [
+            [
+                'id' => (string) Str::uuid(),
+                'items' => json_encode($productsCart1),
+                'created_at' => new DateTime(),
+                'updated_at' => new DateTime(),
+            ],
+            [
+                'id' => (string) Str::uuid(),
+                'items' => json_encode($productsCart2),
+                'created_at' => new DateTime(),
+                'updated_at' => new DateTime(),
+            ],
+        ];
+
+        DB::table('carts')->insert($carts);
     }
 }

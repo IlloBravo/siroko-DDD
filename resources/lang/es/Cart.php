@@ -1,6 +1,11 @@
 <?php
 
 return [
+    'cart_id' => 'ID del carrito',
+    'created_at' => 'Fecha de creación',
+    'updated_at' => 'Actualizado',
+    'view_cart' => 'Ver carrito',
+    'available_carts' => 'Carritos disponibles',
     'products_added' => 'Productos añadidos al carrito correctamente',
     'product_updated' => 'Cantidad del producto actualizada a :quantity',
     'product_removed' => 'Producto eliminado del carrito',
@@ -12,6 +17,7 @@ return [
     'price' => 'Precio',
     'stock' => 'Stock',
     'quantity' => 'Cantidad',
+    'amount_to_build' => '¿Cuantos?',
     'actions' => 'Acciones',
     'add_to_cart' => 'Añadir al Carrito',
     'update' => 'Actualizar',
@@ -20,4 +26,5 @@ return [
     'thank_you' => '¡Gracias!',
     'order_success' => 'Tu pedido se ha realizado con éxito.',
     'continue_shopping' => 'Seguir Comprando',
+    'go_to_products' => 'Productos disponibles',
 ];
