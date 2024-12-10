@@ -107,7 +107,6 @@ class CartController extends Controller
     public function show(string $cartId): View
     {
         $cart = $this->cartRepository->findByIdOrFail(UuidVO::fromString($cartId));
-/*        dd($cart);*/
         return view('cart.show', compact('cart'));
     }
 

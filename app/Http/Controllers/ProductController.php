@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Domain\Cart\Repository\CartRepositoryInterface;
-use App\Domain\Product\Product;
 use App\Domain\Product\Repository\ProductRepositoryInterface;
 use Illuminate\View\View;
 
