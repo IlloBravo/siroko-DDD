@@ -26,7 +26,7 @@ class EloquentCartRepository implements CartRepositoryInterface
     /**
      * @throws DateMalformedStringException
      */
-    public function findById(string $id): ?Cart
+    public function findByIdOrFail(string $id): ?Cart
     {
         $cartData = DB::table('carts')->where('id', $id)->first();
 

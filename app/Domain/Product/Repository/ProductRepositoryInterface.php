@@ -2,9 +2,13 @@
 
 namespace App\Domain\Product\Repository;
 
+use App\Domain\Product\Exceptions\ProductNotFoundException;
 use App\Domain\Product\Product;
 
 interface ProductRepositoryInterface
 {
-    public function findById(string $id): ?Product;
+    /**
+     * @throws ProductNotFoundException
+     */
+    public function findByIdOrFail(string $id): ?Product;
 }

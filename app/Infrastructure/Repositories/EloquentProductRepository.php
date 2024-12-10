@@ -2,25 +2,24 @@
 
 namespace App\Infrastructure\Repositories;
 
+use App\Domain\Product\Exceptions\ProductNotFoundException;
 use App\Domain\Product\Product;
 use App\Domain\Product\Repository\ProductRepositoryInterface;
+use App\Domain\Shared\ValueObjects\UuidVO;
 use Illuminate\Support\Facades\DB;
 
 class EloquentProductRepository implements ProductRepositoryInterface
 {
-    public function findById(string $id): ?Product
+    public function findByIdOrFail(string $id): ?Product
     {
-        $productData = DB::table('products')->where('id', $id)->first();
+        $uuid = UuidVO::fromString($id);
+
+        $productData = DB::table('products')->where('id', (string) $uuid)->first();
 
         if (!$productData) {
-            return null;
+            throw new ProductNotFoundException($id);
         }
 
-        return new Product(
-            $productData->id,
-            $productData->name,
-            (float) $productData->price,
-            (int) $productData->quantity
-        );
+        return Product::create((array) $productData);
     }
 }
