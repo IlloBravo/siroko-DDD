@@ -36,7 +36,9 @@ class CartController extends Controller
 
         $this->addProductToCartUseCase->execute($cartId, $product);
 
-        return response()->json(['message' => 'Product added to cart']);
+        return response()->json([
+            'message' => __('Cart.products_added')
+        ]);
     }
 
     /**
@@ -46,7 +48,11 @@ class CartController extends Controller
     {
         $this->updateProductQuantityUseCase->execute($cartId, $productId, $request->input('quantity'));
 
-        return response()->json(['message' => 'Product quantity updated']);
+        return response()->json([
+            'message' => __('Cart.product_updated', [
+                'quantity' => $request->input('quantity')
+            ])
+        ]);
     }
 
     /**
@@ -56,7 +62,9 @@ class CartController extends Controller
     {
         $this->removeProductFromCartUseCase->execute($cartId, $productId);
 
-        return response()->json(['message' => 'Product removed from cart']);
+        return response()->json([
+            'message' => __('Cart.product_removed')
+        ]);
     }
 
     /**
@@ -76,6 +84,8 @@ class CartController extends Controller
     {
         $this->checkoutCartUseCase->execute($cartId);
 
-        return response()->json(['message' => 'Cart checked out successfully']);
+        return response()->json([
+            'message' => __('Cart.cart_checked_out')
+        ]);
     }
 }

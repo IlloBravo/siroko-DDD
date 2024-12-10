@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'products_added' => 'Products :names added to cart',
+    'products_added' => 'Products added to cart successfully',
     'product_updated' => 'Product quantity updated to :quantity',
     'product_removed' => 'Product removed from cart',
     'invalid_products_data' => 'Invalid products data',
