@@ -5,19 +5,49 @@ namespace Database\Seeders;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class DatabaseSeeder extends Seeder
 {
     /**
      * Seed the application's database.
      */
-    public function run(): void
+    public function run()
     {
-        // User::factory(10)->create();
+        DB::table('products')->insert([
+            [
+                'id' => '4a781e83-bf4a-489c-b547-2e609b351bf7',
+                'name' => 'Gafas',
+                'price' => 10.0,
+                'quantity' => 5,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'id' => 'a9b2d3c4-5678-4def-9012-34c5678f9012',
+                'name' => 'Chaqueta',
+                'price' => 15.5,
+                'quantity' => 3,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'id' => 'd4e5f6a7-89ab-4cde-b012-45f6789c0123',
+                'name' => 'Zapatillas',
+                'price' => 25.0,
+                'quantity' => 2,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]
+        ]);
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+        DB::table('carts')->insert([
+            [
+                'id' => '656de8db-271f-4c02-b2f8-e77d1cd5c5f4',
+                'items' => '[]',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]
         ]);
     }
 }

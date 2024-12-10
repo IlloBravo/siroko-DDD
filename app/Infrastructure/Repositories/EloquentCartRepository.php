@@ -7,7 +7,6 @@ use App\Domain\Cart\CartItem;
 use App\Domain\Cart\Exceptions\CartNotFoundException;
 use App\Domain\Cart\Repository\CartRepositoryInterface;
 use App\Domain\Product\Product;
-use App\Domain\Shared\ValueObjects\UuidVO;
 use DateMalformedStringException;
 use Illuminate\Support\Facades\DB;
 
@@ -18,16 +17,17 @@ class EloquentCartRepository implements CartRepositoryInterface
         $items = $cart->items->map(function (CartItem $item) {
             return [
                 'product' => [
-                    'id' => $item->product->id,
+                    'id' => (string) $item->product->id,
                     'name' => $item->product->name,
                     'price' => $item->product->price,
-                    'quantity' => $item->quantity,
+                    'quantity' => $item->product->quantity,
                 ],
+                'quantity' => $item->quantity,
             ];
         })->toArray();
 
         DB::table('carts')->updateOrInsert(
-            ['id' => $cart->id],
+            ['id' => (string) $cart->id],
             [
                 'items' => json_encode($items),
                 'created_at' => $cart->createdAt->format('Y-m-d H:i:s'),
@@ -55,7 +55,7 @@ class EloquentCartRepository implements CartRepositoryInterface
         });
 
         return Cart::fromArray(
-            UuidVO::fromString($cartData->id),
+            $cartData->id,
             $items,
             $cartData->created_at,
             $cartData->updated_at
