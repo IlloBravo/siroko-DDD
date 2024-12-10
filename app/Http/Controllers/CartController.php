@@ -11,6 +11,7 @@ use App\Domain\Cart\Exceptions\CartNotFoundException;
 use App\Domain\Cart\Repository\CartRepositoryInterface;
 use App\Domain\Product\Exceptions\ProductNotFoundException;
 use App\Domain\Product\Repository\ProductRepositoryInterface;
+use App\Domain\Shared\ValueObjects\UuidVO;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
@@ -33,8 +34,8 @@ class CartController extends Controller
      */
     public function addProduct(Request $request): JsonResponse
     {
-        $product = $this->productRepository->findByIdOrFail($request->input('id'));
-        $cart = $this->cartRepository->findByIdOrFail($request->input('cart_id'));
+        $product = $this->productRepository->findByIdOrFail( UuidVO::fromString($request->input('id')));
+        $cart = $this->cartRepository->findByIdOrFail(UuidVO::fromString($request->input('cart_id')));
 
         $this->addProductToCartUseCase->execute(
             $cart,

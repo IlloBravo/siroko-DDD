@@ -26,7 +26,7 @@ class EloquentCartRepository implements CartRepositoryInterface
     /**
      * @throws DateMalformedStringException
      */
-    public function findByIdOrFail(string $id): Cart
+    public function findByIdOrFail(UuidVO $id): Cart
     {
         $uuid = UuidVO::fromString($id);
 

@@ -10,16 +10,21 @@ use Illuminate\Support\Facades\DB;
 
 class EloquentProductRepository implements ProductRepositoryInterface
 {
-    public function findByIdOrFail(string $id): Product
+    public function findByIdOrFail(UuidVO $id): Product
     {
-        $uuid = UuidVO::fromString($id);
-
-        $productData = DB::table('products')->where('id', (string) $uuid)->first();
+        $productData = DB::table('products')->where('id', (string) $id)->first();
 
         if (!$productData) {
-            throw new ProductNotFoundException($id);
+            throw new ProductNotFoundException((string) $id);
         }
 
         return Product::fromDatabase($productData);
+    }
+
+    public function updateStock(UuidVO $productId, int $quantity): void
+    {
+        DB::table('products')
+            ->where('id', (string) $productId)
+            ->decrement('quantity', $quantity);
     }
 }
