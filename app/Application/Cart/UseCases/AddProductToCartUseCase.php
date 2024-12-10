@@ -14,7 +14,7 @@ readonly class AddProductToCartUseCase
 
     public function execute(string $cartId, CartItem $cartItem): void
     {
-        $cart = $this->cartRepository->findByIdOrFail(UuidVO::fromString($cartId));
+        $cart = $this->cartRepository->findByIdOrFail($cartId);
         $cart->addCartItem($cartItem);
         $this->cartRepository->save($cart);
     }

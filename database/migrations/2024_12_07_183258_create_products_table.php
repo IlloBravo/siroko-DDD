@@ -15,7 +15,7 @@ return new class extends Migration
             $blueprint->uuid('id')->primary();
             $blueprint->string('name');
             $blueprint->decimal('price', 10, 2);
-            $blueprint->integer('quantity');
+            $blueprint->integer('stock');
             $blueprint->timestamps();
         });
     }
