@@ -110,7 +110,7 @@ class CartController extends Controller
     {
         return array_map(function ($productData) {
             $product = Product::fromArray($productData);
-            return CartItem::fromProduct($product, $product->quantity);
+            return CartItem::fromProduct($product, $product->stock);
         }, $productsData);
     }
 

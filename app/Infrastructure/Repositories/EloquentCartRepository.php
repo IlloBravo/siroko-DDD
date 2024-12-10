@@ -20,7 +20,7 @@ class EloquentCartRepository implements CartRepositoryInterface
                     'id' => (string) $item->product->id,
                     'name' => $item->product->name,
                     'price' => $item->product->price,
-                    'quantity' => $item->product->quantity,
+                    'stock' => $item->product->stock,
                 ],
                 'quantity' => $item->quantity,
             ];
@@ -50,7 +50,7 @@ class EloquentCartRepository implements CartRepositoryInterface
         $items = collect(json_decode($cartData->items, true))->map(function (array $item): CartItem {
             return CartItem::fromProduct(
                 Product::fromArray($item['product']),
-                $item['product']['quantity']
+                $item['product']['stock']
             );
         });
 

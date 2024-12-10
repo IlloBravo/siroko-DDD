@@ -10,7 +10,7 @@ final readonly class Product
         public UuidVO $id,
         public string $name,
         public float  $price,
-        public int    $quantity
+        public int $stock
     ) {}
 
     public static function fromArray(array $data): self
@@ -19,7 +19,7 @@ final readonly class Product
             UuidVO::fromString($data['id']),
             $data['name'],
             $data['price'],
-            $data['quantity']
+            $data['stock']
         );
     }
 }

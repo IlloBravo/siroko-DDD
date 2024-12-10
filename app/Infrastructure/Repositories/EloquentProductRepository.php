@@ -21,7 +21,7 @@ class EloquentProductRepository implements ProductRepositoryInterface
             'id' => $productData->id,
             'name' => $productData->name,
             'price' => (float) $productData->price,
-            'quantity' => (int) $productData->quantity
+            'stock' => (int) $productData->stock
         ]);
     }
 
@@ -32,7 +32,7 @@ class EloquentProductRepository implements ProductRepositoryInterface
             [
                 'name' => $product->name,
                 'price' => $product->price,
-                'quantity' => $product->quantity,
+                'stock' => $product->stock,
                 'created_at' => now(),
                 'updated_at' => now(),
             ]
