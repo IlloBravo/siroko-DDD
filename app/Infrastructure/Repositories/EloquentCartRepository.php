@@ -7,6 +7,7 @@ use App\Domain\Cart\CartItem;
 use App\Domain\Cart\Exceptions\CartNotFoundException;
 use App\Domain\Cart\Repository\CartRepositoryInterface;
 use App\Domain\Product\Product;
+use App\Domain\Shared\ValueObjects\UuidVO;
 use DateMalformedStringException;
 use Illuminate\Support\Facades\DB;
 
@@ -54,7 +55,7 @@ class EloquentCartRepository implements CartRepositoryInterface
         });
 
         return Cart::fromArray(
-            $cartData->id,
+            UuidVO::fromString($cartData->id),
             $items,
             $cartData->created_at,
             $cartData->updated_at

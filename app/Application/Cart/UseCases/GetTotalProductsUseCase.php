@@ -4,6 +4,7 @@ namespace App\Application\Cart\UseCases;
 
 use App\Domain\Cart\Exceptions\CartNotFoundException;
 use App\Domain\Cart\Repository\CartRepositoryInterface;
+use App\Domain\Shared\ValueObjects\UuidVO;
 
 readonly class GetTotalProductsUseCase
 {
@@ -14,7 +15,7 @@ readonly class GetTotalProductsUseCase
      */
     public function execute(string $cartId): int
     {
-        $cart = $this->cartRepository->findByIdOrFail($cartId);
+        $cart = $this->cartRepository->findByIdOrFail(UuidVO::fromString($cartId));
         return $cart->getTotalProducts();
     }
 }

@@ -5,6 +5,7 @@ namespace App\Infrastructure\Repositories;
 use App\Domain\Product\Exceptions\ProductNotFoundException;
 use App\Domain\Product\Product;
 use App\Domain\Product\Repository\ProductRepositoryInterface;
+use App\Domain\Shared\ValueObjects\UuidVO;
 use Illuminate\Support\Facades\DB;
 
 class EloquentProductRepository implements ProductRepositoryInterface
@@ -18,10 +19,10 @@ class EloquentProductRepository implements ProductRepositoryInterface
         }
 
         return Product::fromArray([
-            $productData->id,
-            $productData->name,
-            (float) $productData->price,
-            (int) $productData->quantity
+            'id' => UuidVO::fromString($productData->id),
+            'name' => $productData->name,
+            'price' => (float) $productData->price,
+            'quantity' => (int) $productData->quantity
         ]);
     }
 }

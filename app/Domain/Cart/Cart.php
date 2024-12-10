@@ -2,6 +2,7 @@
 
 namespace App\Domain\Cart;
 
+use App\Domain\Shared\ValueObjects\UuidVO;
 use DateMalformedStringException;
 use DateTime;
 use Illuminate\Support\Collection;
@@ -9,7 +10,7 @@ use Illuminate\Support\Collection;
 final class Cart
 {
     public function __construct(
-        public readonly string $id,
+        public readonly UuidVO $id,
         public Collection $items,
         public readonly DateTime $createdAt,
         public DateTime $updatedAt
@@ -21,7 +22,7 @@ final class Cart
     public static function fromArray(string $id, Collection $items, string $createdAt, string $updatedAt): self
     {
         return new self(
-            $id,
+            UuidVO::fromString($id),
             $items,
             new DateTime($createdAt),
             new DateTime($updatedAt)

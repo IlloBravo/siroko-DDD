@@ -2,10 +2,12 @@
 
 namespace App\Domain\Product;
 
+use App\Domain\Shared\ValueObjects\UuidVO;
+
 final readonly class Product
 {
     public function __construct(
-        public string $id,
+        public UuidVO $id,
         public string $name,
         public float  $price,
         public int    $quantity
@@ -14,7 +16,7 @@ final readonly class Product
     public static function fromArray(array $data): self
     {
         return new self(
-            $data['id'],
+            UuidVO::fromString($data['id']),
             $data['name'],
             $data['price'],
             $data['quantity']
