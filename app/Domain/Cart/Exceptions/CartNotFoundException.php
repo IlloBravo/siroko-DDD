@@ -8,7 +8,7 @@ class CartNotFoundException extends RuntimeException
 {
     public function __construct(string $cartId)
     {
-        $message = __('cart.cart_not_found', ['id' => $cartId]);
+        $message = __('Cart.cart_not_found', ['id' => $cartId]);
         parent::__construct($message);
     }
 }

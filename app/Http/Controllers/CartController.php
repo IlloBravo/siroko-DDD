@@ -7,6 +7,7 @@ use App\Application\Cart\UseCases\UpdateProductQuantityUseCase;
 use App\Application\Cart\UseCases\RemoveProductFromCartUseCase;
 use App\Application\Cart\UseCases\GetTotalProductsUseCase;
 use App\Application\Cart\UseCases\CheckoutCartUseCase;
+use App\Domain\Cart\CartItem;
 use App\Domain\Cart\Exceptions\CartNotFoundException;
 use App\Domain\Product\Product;
 use Illuminate\Http\Request;
@@ -22,6 +23,9 @@ class CartController extends Controller
         private readonly CheckoutCartUseCase          $checkoutCartUseCase
     ) {}
 
+    /**
+     * @throws CartNotFoundException
+     */
     public function addProduct(Request $request, string $cartId): JsonResponse
     {
         $productsData = $this->validateProductsData($request);
@@ -30,10 +34,10 @@ class CartController extends Controller
             return $this->invalidProductsResponse();
         }
 
-        $products = $this->createProductsFromData($productsData);
-        $this->addProductsToCart($cartId, $products);
+        $cartItems = $this->createCartItemsFromData($productsData);
+        $this->addCartItemsToCart($cartId, $cartItems);
 
-        return $this->successResponse($products);
+        return $this->ProductAddedSuccessResponse($cartItems);
     }
 
     /**
@@ -103,24 +107,27 @@ class CartController extends Controller
         ], 400);
     }
 
-    private function createProductsFromData(array $productsData): array
+    private function createCartItemsFromData(array $productsData): array
     {
-        return array_map(fn($productData) => Product::fromArray($productData), $productsData);
+        return array_map(function ($productData) {
+            $product = Product::fromArray($productData);
+            return CartItem::fromProduct($product, $product->quantity);
+        }, $productsData);
     }
 
     /**
      * @throws CartNotFoundException
      */
-    private function addProductsToCart(string $cartId, array $products): void
+    private function addCartItemsToCart(string $cartId, array $cartItems): void
     {
-        foreach ($products as $product) {
-            $this->addProductToCartUseCase->execute($cartId, $product);
+        foreach ($cartItems as $cartItem) {
+            $this->addProductToCartUseCase->execute($cartId, $cartItem);
         }
     }
 
-    private function successResponse(array $products): JsonResponse
+    private function ProductAddedSuccessResponse(array $cartItems): JsonResponse
     {
-        $productNames = array_map(fn($product) => $product->name, $products);
+        $productNames = array_map(fn($cartItem) => $cartItem->product->name, $cartItems);
 
         return response()->json([
             'message' => __('Cart.products_added', ['names' => implode(', ', $productNames)])

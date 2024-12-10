@@ -2,7 +2,6 @@
 
 namespace App\Domain\Cart;
 
-use App\Domain\Product\Product;
 use DateMalformedStringException;
 use DateTime;
 use Illuminate\Support\Collection;
@@ -29,32 +28,32 @@ final class Cart
         );
     }
 
-    public function addProduct(Product $product): void
+    public function addCartItem(CartItem $cartItem): void
     {
-        $this->items->push($product);
+        $this->items->push($cartItem);
         $this->updatedAt = new DateTime();
     }
 
     public function updateProductQuantity(string $productId, int $quantity): void
     {
-        $this->items = $this->items->map(function ($item) use ($productId, $quantity) {
-            if ($item->id === $productId) {
-                $item->quantity = $quantity;
+        $this->items = $this->items->map(function ($cartItem) use ($productId, $quantity) {
+            if ($cartItem->product->id === $productId) {
+                $cartItem->updateQuantity($quantity);
             }
-            return $item;
+            return $cartItem;
         });
         $this->updatedAt = new DateTime();
     }
 
     public function removeProduct(string $productId): void
     {
-        $this->items = $this->items->reject(fn($item): bool => $item->id === $productId);
+        $this->items = $this->items->reject(fn($cartItem): bool => $cartItem->product->id === $productId);
         $this->updatedAt = new DateTime();
     }
 
     public function getTotalProducts(): int
     {
-        return $this->items->sum(fn($item) => $item->quantity);
+        return $this->items->sum(fn($cartItem) => $cartItem->quantity);
     }
 
     public function checkout(): void
