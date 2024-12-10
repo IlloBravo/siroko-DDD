@@ -53,7 +53,11 @@ class CartController extends Controller
      */
     public function updateProduct(Request $request, string $cartId, string $productId): JsonResponse
     {
-        $this->updateProductQuantityUseCase->execute($cartId, $productId, $request->input('quantity'));
+        $this->updateProductQuantityUseCase->execute(
+            $cartId,
+            $productId,
+            $request->input('quantity')
+        );
 
         return response()->json([
             'message' => __('Cart.product_updated', [
@@ -67,7 +71,10 @@ class CartController extends Controller
      */
     public function removeProduct(string $cartId, string $productId): JsonResponse
     {
-        $this->removeProductFromCartUseCase->execute($cartId, $productId);
+        $this->removeProductFromCartUseCase->execute(
+            $cartId,
+            $productId
+        );
 
         return response()->json([
             'message' => __('Cart.product_removed')

@@ -16,7 +16,7 @@ readonly class RemoveProductFromCartUseCase
     public function execute(string $cartId, string $productId): void
     {
         $cart = $this->cartRepository->findByIdOrFail(UuidVO::fromString($cartId));
-        $cart->removeProduct($productId);
+        $cart->removeProduct(UuidVO::fromString($productId));
         $this->cartRepository->save($cart);
     }
 }
