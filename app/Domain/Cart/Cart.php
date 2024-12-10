@@ -19,10 +19,10 @@ final class Cart
     /**
      * @throws DateMalformedStringException
      */
-    public static function fromArray(object $cartData, Collection $items, DateTime $createdAt, DateTime $updatedAt): self
+    public static function fromArray(string $id, Collection $items, string $createdAt, string $updatedAt): self
     {
         return new self(
-            $cartData->id,
+            $id,
             $items,
             new DateTime($createdAt),
             new DateTime($updatedAt)

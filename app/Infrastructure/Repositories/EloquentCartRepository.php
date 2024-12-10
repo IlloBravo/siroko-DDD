@@ -37,18 +37,18 @@ class EloquentCartRepository implements CartRepositoryInterface
 
         $items = collect(json_decode($cartData->items, true))->map(function (array $item): Product {
             return Product::fromArray([
-                $item['id'],
-                $item['name'],
-                $item['price'],
-                $item['quantity']
+                'id' => $item['id'],
+                'name' => $item['name'],
+                'price' => $item['price'],
+                'quantity' => $item['quantity']
             ]);
         });
 
         return Cart::fromArray(
             $cartData->id,
             $items,
-            new DateTime($cartData->created_at),
-            new DateTime($cartData->updated_at)
+            $cartData->created_at,
+            $cartData->updated_at
         );
     }
 

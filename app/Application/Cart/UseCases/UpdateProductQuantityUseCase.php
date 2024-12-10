@@ -2,15 +2,15 @@
 
 namespace App\Application\Cart\UseCases;
 
+use App\Domain\Cart\Exceptions\CartNotFoundException;
 use App\Domain\Cart\Repository\CartRepositoryInterface;
-use Exception;
 
 readonly class UpdateProductQuantityUseCase
 {
     public function __construct(private CartRepositoryInterface $cartRepository) {}
 
     /**
-     * @throws Exception
+     * @throws CartNotFoundException
      */
     public function execute(string $cartId, string $productId, int $quantity): void
     {
