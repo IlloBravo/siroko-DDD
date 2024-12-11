@@ -22,10 +22,10 @@ readonly class RemoveProductFromCartUseCase
         $uuidProduct = UuidVO::fromString($productId);
         $cart = $this->cartRepository->findByIdOrFail(UuidVO::fromString($cartId));
 
-        $quantityRemoved = $cart->getProductStock($uuidProduct);
+        $quantityRemoved = $cart->getProductQuantity($uuidProduct);
         $cart->removeProduct($uuidProduct);
-
         $this->cartRepository->save($cart);
+
         $this->productRepository->increaseStock($uuidProduct, $quantityRemoved);
     }
 }

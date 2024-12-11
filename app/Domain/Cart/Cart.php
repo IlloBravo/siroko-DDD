@@ -113,4 +113,11 @@ final class Cart
     {
         return $this->items->first(fn(Product $item) => $item->id->equals($productId));
     }
+
+    public function getProductQuantity(UuidVO $productId): int
+    {
+        return $this->items
+            ->filter(fn(Product $item) => $item->id->equals($productId))
+            ->first()->cartQuantity;
+    }
 }
