@@ -29,6 +29,7 @@ return [
     'go_to_products' => 'Productos disponibles',
     'all_products' => 'Todos los Productos',
     'all_carts' => 'Todos los Carritos',
-    'cart_created_with_product' => 'Producto añadido al carrito!',
+    'cart_created_with_product' => 'Producto/s añadido/s al carrito!',
     'add_product_error' => 'Error al añadir el producto al carrito',
+    'products' => 'Productos',
 ];
