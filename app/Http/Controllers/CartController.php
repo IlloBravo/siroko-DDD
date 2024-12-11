@@ -54,21 +54,19 @@ class CartController extends Controller
     }
 
     /**
-     * @throws Exception
+     * @throws CartNotFoundException
      */
-    public function updateProduct(Request $request, string $cartId, string $productId): JsonResponse
+    public function updateProduct(Request $request, string $cartId): RedirectResponse
     {
-        $this->updateProductQuantityUseCase->execute(
-            $cartId,
-            $productId,
-            $request->input('quantity')
-        );
+        $productsData = $request->input('products');
 
-        return response()->json([
-            'message' => __('Cart.product_updated', [
-                'quantity' => $request->input('quantity')
-            ])
-        ]);
+        foreach ($productsData as $productId => $productData) {
+            $quantity = (int) $productData['quantity'];
+            $this->updateProductQuantityUseCase->execute($cartId, $productId, $quantity);
+        }
+
+        return redirect()->route('cart.show', ['cartId' => $cartId])
+            ->with('success', __('Cart.cart_updated'));
     }
 
     /**
