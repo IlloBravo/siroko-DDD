@@ -76,8 +76,8 @@ class CartController extends Controller
     {
         $this->removeProductFromCartUseCase->execute($cartId, $productId);
 
-        return redirect()->route('cart.show', ['cartId' => $cartId])
-            ->with('success', __('Cart.product_removed'));
+        return redirect()->route('cart.index')
+            ->with('success', __('Cart.cart_checked_out'));
     }
 
     /**
@@ -121,9 +121,6 @@ class CartController extends Controller
         return view('cart.thankyou');
     }
 
-    /**
-     * @throws DateMalformedStringException
-     */
     /**
      * @throws DateMalformedStringException
      */
