@@ -131,7 +131,7 @@ class CartController extends Controller
     /**
      * @throws DateMalformedStringException
      */
-    public function createCart(Request $request): RedirectResponse
+    public function createCart(Request $request): JsonResponse
     {
         $cartId = (string) Uuid::uuid4();
 
@@ -145,14 +145,15 @@ class CartController extends Controller
         $this->cartRepository->save($cart);
 
         $productId = UuidVO::fromString($request->input('id'));
-
         $product = $this->productRepository->findByIdOrFail($productId);
         $quantity = $request->input('quantity');
 
         $this->addProductToCartUseCase->execute($cart, $product, $quantity);
         $this->cartRepository->save($cart);
 
-        return redirect()->route('cart.show', ['cartId' => $cartId])
-            ->with('success', __('Cart.cart_created_with_product'));
+        return response()->json([
+            'message' => __('Cart.cart_created_with_product'),
+            'cartId' => $cartId,
+        ]);
     }
 }

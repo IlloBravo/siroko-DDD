@@ -29,4 +29,6 @@ return [
     'go_to_products' => 'Go To Products',
     'all_products' => 'All Products',
     'all_carts' => 'All Carts',
+    'cart_created_with_product' => 'Product added to cart successfully!',
+    'add_product_error' => 'Error adding product to cart',
 ];
