@@ -3,11 +3,9 @@
 @section('content')
     <h1>{{ __('Cart.your_cart') }}</h1>
 
-    @if (session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
-    @endif
+    <div id="alert-container"></div>
 
-    <form action="{{ route('api.cart.updateProduct', ['cartId' => $cart->id]) }}" method="POST">
+    <form id="update-cart-form" action="{{ route('api.cart.updateProduct', ['cartId' => $cart->id]) }}" method="POST">
         @csrf
         @method('PUT')
 
@@ -68,6 +66,25 @@
                         }
                     });
                 }
+            });
+            $('#update-cart-form').on('submit', function (e) {
+                e.preventDefault();
+
+                $.ajax({
+                    url: $(this).attr('action'),
+                    method: 'PUT',
+                    data: $(this).serialize(),
+                    success: function (response) {
+                        $('#alert-container').html('<div class="alert alert-success">' + response.message + '</div>');
+                    },
+                    error: function (xhr) {
+                        if (xhr.responseJSON && xhr.responseJSON.error) {
+                            $('#alert-container').html('<div class="alert alert-danger">' + xhr.responseJSON.error + '</div>');
+                        } else {
+                            $('#alert-container').html('<div class="alert alert-danger">Error al actualizar el carrito.</div>');
+                        }
+                    }
+                });
             });
         });
     </script>

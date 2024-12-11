@@ -4,10 +4,9 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 use DateTime;
-use App\Domain\Product\Product;
-use App\Domain\Shared\ValueObjects\UuidVO;
+use Illuminate\Support\Facades\App;
+use Ramsey\Uuid\Uuid;
 
 class CartSeeder extends Seeder
 {
@@ -16,55 +15,40 @@ class CartSeeder extends Seeder
      */
     public function run(): void
     {
+        // Ejecutar ProductSeeder y obtener los productos
+        $productSeeder = App::make(ProductSeeder::class);
+        $products = $productSeeder->run();
+
+        // Crear carritos usando productos existentes
         $productsCart1 = [
-            Product::create([
-                'id' => (string) Str::uuid(),
-                'name' => 'Gafas de Sol',
-                'price' => 49.99,
-                'quantity' => 2,
-            ]),
-            Product::create([
-                'id' => (string) Str::uuid(),
-                'name' => 'Chaqueta de Cuero',
-                'price' => 129.99,
-                'quantity' => 1,
-            ]),
+            $products[0], // Gafas de Sol Deportivas
+            $products[1], // Chaqueta Deportiva
         ];
 
         $productsCart2 = [
-            Product::create([
-                'id' => (string) Str::uuid(),
-                'name' => 'Zapatillas Deportivas',
-                'price' => 89.99,
-                'quantity' => 1,
-            ]),
-            Product::create([
-                'id' => (string) Str::uuid(),
-                'name' => 'Camiseta Básica',
-                'price' => 19.99,
-                'quantity' => 3,
-            ]),
+            $products[2], // Zapatillas de Running
+            $products[3], // Camiseta Técnica
         ];
 
         $carts = [
             [
-                'id' => (string) Str::uuid(),
+                'id' => (string) Uuid::uuid4(),
                 'items' => json_encode(array_map(fn($product) => [
-                    'id' => (string) $product->id,
-                    'name' => $product->name,
-                    'price' => $product->price,
-                    'quantity' => $product->quantity,
+                    'id' => $product['id'],
+                    'name' => $product['name'],
+                    'price' => $product['price'],
+                    'quantity' => 1,
                 ], $productsCart1)),
                 'created_at' => new DateTime(),
                 'updated_at' => new DateTime(),
             ],
             [
-                'id' => (string) Str::uuid(),
+                'id' => (string) Uuid::uuid4(),
                 'items' => json_encode(array_map(fn($product) => [
-                    'id' => (string) $product->id,
-                    'name' => $product->name,
-                    'price' => $product->price,
-                    'quantity' => $product->quantity,
+                    'id' => $product['id'],
+                    'name' => $product['name'],
+                    'price' => $product['price'],
+                    'quantity' => 1,
                 ], $productsCart2)),
                 'created_at' => new DateTime(),
                 'updated_at' => new DateTime(),

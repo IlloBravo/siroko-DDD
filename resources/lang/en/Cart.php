@@ -32,4 +32,5 @@ return [
     'cart_created_with_product' => 'Product/s added to cart successfully!',
     'add_product_error' => 'Error adding product to cart',
     'products' => 'Products',
+    'cart_updated' => 'Cart updated successfully',
 ];

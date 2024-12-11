@@ -10,6 +10,7 @@ use App\Application\Cart\UseCases\CheckoutCartUseCase;
 use App\Domain\Cart\Cart;
 use App\Domain\Cart\Exceptions\CartNotFoundException;
 use App\Domain\Cart\Repository\CartRepositoryInterface;
+use App\Domain\Product\Exceptions\InsufficientStockException;
 use App\Domain\Product\Exceptions\ProductNotFoundException;
 use App\Domain\Product\Repository\ProductRepositoryInterface;
 use App\Domain\Shared\ValueObjects\UuidVO;
@@ -56,17 +57,31 @@ class CartController extends Controller
     /**
      * @throws CartNotFoundException
      */
-    public function updateProduct(Request $request, string $cartId): RedirectResponse
+    public function updateProduct(Request $request, string $cartId): JsonResponse|RedirectResponse
     {
         $productsData = $request->input('products');
 
-        foreach ($productsData as $productId => $productData) {
-            $quantity = (int) $productData['quantity'];
-            $this->updateProductQuantityUseCase->execute($cartId, $productId, $quantity);
-        }
+        try {
+            foreach ($productsData as $productId => $productData) {
+                $quantity = (int) $productData['quantity'];
+                $this->updateProductQuantityUseCase->execute($cartId, $productId, $quantity);
+            }
 
-        return redirect()->route('cart.show', ['cartId' => $cartId])
-            ->with('success', __('Cart.cart_updated'));
+            if ($request->ajax()) {
+                return response()->json(['message' => __('Cart.cart_updated')]);
+            }
+
+            return redirect()->route('cart.show', ['cartId' => $cartId])
+                ->with('success', __('Cart.cart_updated'));
+
+        } catch (InsufficientStockException $e) {
+            if ($request->ajax()) {
+                return response()->json(['error' => $e->getMessage()], 400);
+            }
+
+            return redirect()->route('cart.show', ['cartId' => $cartId])
+                ->with('error', $e->getMessage());
+        }
     }
 
     /**

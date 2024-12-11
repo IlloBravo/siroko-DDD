@@ -32,4 +32,5 @@ return [
     'cart_created_with_product' => 'Producto/s añadido/s al carrito!',
     'add_product_error' => 'Error al añadir el producto al carrito',
     'products' => 'Productos',
+    'cart_updated' => 'Carrito actualizado',
 ];
