@@ -12,6 +12,12 @@ interface ProductRepositoryInterface
      * @throws ProductNotFoundException
      */
     public function findByIdOrFail(UuidVO $id): Product;
+
     public function findAll(): array;
+
+    public function updateStock(UuidVO $productId, int $quantity): void;
+
     public function increaseStock(UuidVO $productId, int $quantity): void;
+
+    public function save(Product $product): void;
 }

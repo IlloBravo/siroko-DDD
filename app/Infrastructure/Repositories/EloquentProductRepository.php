@@ -28,6 +28,13 @@ class EloquentProductRepository implements ProductRepositoryInterface
             ->decrement('quantity', $quantity);
     }
 
+    public function increaseStock(UuidVO $productId, int $quantity): void
+    {
+        DB::table('products')
+            ->where('id', (string) $productId)
+            ->increment('quantity', $quantity);
+    }
+
     public function findAll(): array
     {
         $productsData = DB::table('products')->get();
@@ -37,10 +44,15 @@ class EloquentProductRepository implements ProductRepositoryInterface
         })->toArray();
     }
 
-    public function increaseStock(UuidVO $productId, int $quantity): void
+    public function save(Product $product): void
     {
         DB::table('products')
-            ->where('id', (string) $productId)
-            ->increment('quantity', $quantity);
+            ->where('id', (string) $product->id)
+            ->update([
+                'name' => $product->name,
+                'price' => $product->price,
+                'quantity' => $product->quantity,
+                'updated_at' => now(),
+            ]);
     }
 }

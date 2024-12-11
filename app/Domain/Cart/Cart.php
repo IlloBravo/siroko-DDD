@@ -108,4 +108,9 @@ final class Cart
 
         return $product->quantity;
     }
+
+    public function getProduct(UuidVO $productId): ?Product
+    {
+        return $this->items->first(fn(Product $item) => $item->id->equals($productId));
+    }
 }
