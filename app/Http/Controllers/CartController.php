@@ -131,9 +131,8 @@ class CartController extends Controller
     /**
      * @throws DateMalformedStringException
      */
-    public function createCart(Request $request): View
+    public function createCart(Request $request): RedirectResponse
     {
-        // FALTA POR DESARROLLAR QUE AL CREAR EL CARRITO, SE AÑADE EL PRODUCTO AL CREARLO
         $cartId = (string) Uuid::uuid4();
 
         $cart = Cart::create([
@@ -145,8 +144,15 @@ class CartController extends Controller
 
         $this->cartRepository->save($cart);
 
-        $request->session()->put('cart_id', $cartId);
+        $productId = UuidVO::fromString($request->input('id'));
 
-        return view('cart.confirmation', ['cartId' => $cartId]);
+        $product = $this->productRepository->findByIdOrFail($productId);
+        $quantity = $request->input('quantity');
+
+        $this->addProductToCartUseCase->execute($cart, $product, $quantity);
+        $this->cartRepository->save($cart);
+
+        return redirect()->route('cart.show', ['cartId' => $cartId])
+            ->with('success', __('Cart.cart_created_with_product'));
     }
 }

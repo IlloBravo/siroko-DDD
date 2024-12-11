@@ -15,11 +15,18 @@ class EloquentCartRepository implements CartRepositoryInterface
     public function save(Cart $cart): void
     {
         DB::table('carts')->updateOrInsert(
-            ['id' => $cart->id],
+            ['id' => (string) $cart->id],
             [
-                'items' => json_encode($cart->items),
-                'created_at' => $cart->createdAt->format('Y-m-d H:i:s'),
-                'updated_at' => $cart->updatedAt->format('Y-m-d H:i:s'),
+                'items' => json_encode($cart->items->map(function (Product $item) {
+                    return [
+                        'id' => (string) $item->id,
+                        'name' => $item->name,
+                        'price' => $item->price,
+                        'quantity' => $item->quantity,
+                    ];
+                })->values()->all()),
+                'created_at' => $cart->createdAt,
+                'updated_at' => $cart->updatedAt,
             ]
         );
     }
@@ -50,7 +57,7 @@ class EloquentCartRepository implements CartRepositoryInterface
         $cartsData = DB::table('carts')->get();
 
         return $cartsData->map(function ($cartData) {
-            return Cart::fromDatabase($cartData);
+            return Cart::fromDatabase((object) $cartData);
         })->toArray();
     }
 }
