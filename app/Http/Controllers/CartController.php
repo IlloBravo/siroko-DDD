@@ -93,13 +93,12 @@ class CartController extends Controller
     /**
      * @throws Exception
      */
-    public function checkout(string $cartId): JsonResponse
+    public function checkout(string $cartId): RedirectResponse
     {
         $this->checkoutCartUseCase->execute($cartId);
 
-        return response()->json([
-            'message' => __('Cart.cart_checked_out')
-        ]);
+        return redirect()->route('cart.show', ['cartId' => $cartId])
+            ->with('success', __('Cart.cart_checked_out'));
     }
 
     public function index(): View

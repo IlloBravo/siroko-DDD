@@ -41,6 +41,9 @@
         </table>
 
         <button type="submit" class="btn btn-primary">{{ __('Cart.update') }}</button>
-        <a href="{{ url('api/cart/' . $cart->id . '/checkout') }}" class="btn btn-success">{{ __('Cart.checkout') }}</a>
+    </form>
+    <form action="{{ route('api.cart.checkout', ['cartId' => $cart->id]) }}" method="POST" class="mt-2">
+        @csrf
+        <button type="submit" class="btn btn-success">{{ __('Cart.checkout') }}</button>
     </form>
 @endsection
