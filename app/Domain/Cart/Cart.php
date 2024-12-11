@@ -2,7 +2,6 @@
 
 namespace App\Domain\Cart;
 
-use App\Domain\Product\Exceptions\InsufficientStockException;
 use App\Domain\Product\Product;
 use App\Domain\Shared\ValueObjects\UuidVO;
 use DateMalformedStringException;
@@ -52,22 +51,22 @@ final class Cart
     {
         $product->decreaseStock($quantity);
 
-        $productInCart = clone $product;
-        $productInCart->cartQuantity = $quantity;
+        $existingItem = $this->items->first(fn(Product $item) => $item->id->equals($product->id));
+        if ($existingItem) {
+            $existingItem->cartQuantity += $quantity;
+        } else {
+            $product->cartQuantity = $quantity;
+            $this->items->push($product);
+        }
 
-        $this->items->push($productInCart);
         $this->updatedAt = new DateTime();
     }
 
     public function updateProductQuantity(UuidVO $productId, int $newQuantity): void
     {
-        $this->items = $this->items->map(function (Product $item) use ($productId, $newQuantity) {
+        $this->items->each(function (Product $item) use ($productId, $newQuantity) {
             if ($item->id->equals($productId)) {
                 $difference = $newQuantity - $item->cartQuantity;
-
-                if ($difference > 0 && $item->quantity < $difference) {
-                    throw new InsufficientStockException($productId);
-                }
 
                 if ($difference > 0) {
                     $item->decreaseStock($difference);
@@ -77,7 +76,6 @@ final class Cart
 
                 $item->cartQuantity = $newQuantity;
             }
-            return $item;
         });
 
         $this->updatedAt = new DateTime();
@@ -98,7 +96,7 @@ final class Cart
 
     public function getTotalProducts(): int
     {
-        return $this->items->sum(fn(Product $item) => $item->quantity);
+        return $this->items->sum(fn(Product $item) => $item->cartQuantity);
     }
 
     public function checkout(): void
@@ -109,9 +107,13 @@ final class Cart
 
     public function getProductStock(UuidVO $productId): int
     {
-        $product = $this->items->first(fn(Product $item) => $item->id->equals($productId));
+        $product = $this->getProduct($productId);
 
-        return $product->quantity;
+        if (!$product) {
+            return 0;
+        }
+
+        return $product->quantity + $product->cartQuantity;
     }
 
     public function getProduct(UuidVO $productId): ?Product
@@ -121,8 +123,10 @@ final class Cart
 
     public function getProductQuantity(UuidVO $productId): int
     {
-        return $this->items
+        $product = $this->items
             ->filter(fn(Product $item) => $item->id->equals($productId))
-            ->first()->cartQuantity;
+            ->first();
+
+        return $product ? $product->cartQuantity : 0;
     }
 }
