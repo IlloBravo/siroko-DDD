@@ -56,7 +56,7 @@
                     data: form.serialize(),
                     success: function (response) {
                         $('#alert-container').html('<div class="alert alert-success">' + response.message + '</div>');
-                        $('#view-cart-button').attr('href', '/cart/' + response.cartId);
+                        $('#view-cart-button').attr('href', '/cart/' + response.cartId + '/view');
                         $('#cart-button-container').show();
                     },
                     error: function (xhr) {
