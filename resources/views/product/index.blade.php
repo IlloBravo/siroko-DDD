@@ -10,33 +10,33 @@
 
     <div id="alert-container"></div>
 
-    <table class="table table-striped">
-        <thead>
-        <tr>
-            <th>{{ __('Cart.product_name') }}</th>
-            <th>{{ __('Cart.price') }}</th>
-            <th>{{ __('Cart.stock') }}</th>
-            <th>{{ __('Cart.actions') }}</th>
-        </tr>
-        </thead>
-        <tbody>
-        @foreach ($products as $product)
+    <form id="add-to-cart-form">
+        @csrf
+        <table class="table table-striped">
+            <thead>
             <tr>
-                <td>{{ $product->name }}</td>
-                <td>{{ $product->price }}</td>
-                <td>{{ $product->quantity }}</td>
-                <td>
-                    <form class="add-to-cart-form">
-                        @csrf
-                        <input type="hidden" name="id" value="{{ $product->id }}">
-                        <input type="number" name="quantity" min="1" max="{{ $product->quantity }}" class="form-control d-inline w-25" required>
-                        <button type="submit" class="btn btn-primary btn-sm">{{ __('Cart.add_to_cart') }}</button>
-                    </form>
-                </td>
+                <th>{{ __('Cart.product_name') }}</th>
+                <th>{{ __('Cart.price') }}</th>
+                <th>{{ __('Cart.stock') }}</th>
+                <th>{{ __('Cart.quantity') }}</th>
             </tr>
-        @endforeach
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+            @foreach ($products as $product)
+                <tr>
+                    <td>{{ $product->name }}</td>
+                    <td>{{ $product->price }}</td>
+                    <td>{{ $product->quantity }}</td>
+                    <td>
+                        <input type="hidden" name="products[{{ $product->id }}][id]" value="{{ $product->id }}">
+                        <input type="number" name="products[{{ $product->id }}][quantity]" min="0" max="{{ $product->quantity }}" class="form-control w-50" value="0">
+                    </td>
+                </tr>
+            @endforeach
+            </tbody>
+        </table>
+        <button type="submit" class="btn btn-primary mt-3">{{ __('Cart.add_to_cart') }}</button>
+    </form>
 
     <div id="cart-button-container" class="mt-4" style="display: none;">
         <a id="view-cart-button" href="#" class="btn btn-success">{{ __('Cart.view_cart') }}</a>
@@ -46,18 +46,21 @@
 @section('scripts')
     <script>
         $(document).ready(function () {
-            $('.add-to-cart-form').on('submit', function (e) {
+            $('#add-to-cart-form').on('submit', function (e) {
                 e.preventDefault();
-                let form = $(this);
 
                 $.ajax({
                     url: '{{ route('api.cart.createCart') }}',
                     method: 'POST',
-                    data: form.serialize(),
+                    data: $(this).serialize(),
                     success: function (response) {
-                        $('#alert-container').html('<div class="alert alert-success">' + response.message + '</div>');
-                        $('#view-cart-button').attr('href', '/cart/' + response.cartId + '/view');
-                        $('#cart-button-container').show();
+                        if (response.message && response.cartId) {
+                            $('#alert-container').html('<div class="alert alert-success">' + response.message + '</div>');
+                            $('#view-cart-button').attr('href', '/cart/' + response.cartId + '/view');
+                            $('#cart-button-container').show();
+                        } else {
+                            $('#alert-container').html('<div class="alert alert-danger">Error en la respuesta del servidor.</div>');
+                        }
                     },
                     error: function (xhr) {
                         $('#alert-container').html('<div class="alert alert-danger">{{ __('Cart.add_product_error') }}</div>');

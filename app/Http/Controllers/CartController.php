@@ -131,6 +131,9 @@ class CartController extends Controller
     /**
      * @throws DateMalformedStringException
      */
+    /**
+     * @throws DateMalformedStringException
+     */
     public function createCart(Request $request): JsonResponse
     {
         $cartId = (string) Uuid::uuid4();
@@ -144,16 +147,23 @@ class CartController extends Controller
 
         $this->cartRepository->save($cart);
 
-        $productId = UuidVO::fromString($request->input('id'));
-        $product = $this->productRepository->findByIdOrFail($productId);
-        $quantity = $request->input('quantity');
+        $products = $request->input('products');
 
-        $this->addProductToCartUseCase->execute($cart, $product, $quantity);
+        foreach ($products as $productData) {
+            $productId = UuidVO::fromString($productData['id']);
+            $quantity = (int) $productData['quantity'];
+
+            if ($quantity > 0) {
+                $product = $this->productRepository->findByIdOrFail($productId);
+                $this->addProductToCartUseCase->execute($cart, $product, $quantity);
+            }
+        }
+
         $this->cartRepository->save($cart);
 
         return response()->json([
             'message' => __('Cart.cart_created_with_product'),
-            'cartId' => $cartId,
-        ]);
+            'cartId' => $cartId
+        ])->cookie('cart_id', $cartId, 60);
     }
 }
