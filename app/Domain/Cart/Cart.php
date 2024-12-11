@@ -2,6 +2,7 @@
 
 namespace App\Domain\Cart;
 
+use App\Domain\Product\Exceptions\InsufficientStockException;
 use App\Domain\Product\Product;
 use App\Domain\Shared\ValueObjects\UuidVO;
 use DateMalformedStringException;
@@ -63,6 +64,10 @@ final class Cart
         $this->items = $this->items->map(function (Product $item) use ($productId, $newQuantity) {
             if ($item->id->equals($productId)) {
                 $difference = $newQuantity - $item->cartQuantity;
+
+                if ($difference > 0 && $item->quantity < $difference) {
+                    throw new InsufficientStockException($productId);
+                }
 
                 if ($difference > 0) {
                     $item->decreaseStock($difference);
