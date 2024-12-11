@@ -72,16 +72,12 @@ class CartController extends Controller
     /**
      * @throws Exception
      */
-    public function removeProduct(string $cartId, string $productId): JsonResponse
+    public function removeProduct(string $cartId, string $productId): RedirectResponse
     {
-        $this->removeProductFromCartUseCase->execute(
-            $cartId,
-            $productId
-        );
+        $this->removeProductFromCartUseCase->execute($cartId, $productId);
 
-        return response()->json([
-            'message' => __('Cart.product_removed')
-        ]);
+        return redirect()->route('cart.show', ['cartId' => $cartId])
+            ->with('success', __('Cart.product_removed'));
     }
 
     /**

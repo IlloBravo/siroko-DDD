@@ -27,9 +27,13 @@
                         <input type="number" name="products[{{ $product->id }}][quantity]" value="{{ $product->quantity }}" min="1" class="form-control w-50">
                     </td>
                     <td>
-                        <button type="button" class="btn btn-danger btn-sm delete-button" data-product-id="{{ $product->id }}">
-                            {{ __('Cart.remove') }}
-                        </button>
+                        <form action="{{ route('api.cart.removeProduct', ['cartId' => $cart->id, 'productId' => $product->id]) }}" method="POST" class="d-inline">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="btn btn-danger btn-sm">
+                                {{ __('Cart.remove') }}
+                            </button>
+                        </form>
                     </td>
                 </tr>
             @endforeach
@@ -39,34 +43,4 @@
         <button type="submit" class="btn btn-primary">{{ __('Cart.update') }}</button>
         <a href="{{ url('api/cart/' . $cart->id . '/checkout') }}" class="btn btn-success">{{ __('Cart.checkout') }}</a>
     </form>
-@endsection
-
-@section('scripts')
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const deleteButtons = document.querySelectorAll('.delete-button');
-
-            deleteButtons.forEach(button => {
-                button.addEventListener('click', function () {
-                    const productId = this.getAttribute('data-product-id');
-                    const cartId = "{{ $cart->id }}";
-
-                    if (confirm('¿Estás seguro de que quieres eliminar este producto del carrito?')) {
-                        fetch(`/api/cart/${cartId}/products/${productId}`, {
-                            method: 'DELETE',
-                            headers: {
-                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                            }
-                        }).then(response => {
-                            if (response.ok) {
-                                location.reload();
-                            } else {
-                                alert('Error al eliminar el producto.');
-                            }
-                        });
-                    }
-                });
-            });
-        });
-    </script>
 @endsection
