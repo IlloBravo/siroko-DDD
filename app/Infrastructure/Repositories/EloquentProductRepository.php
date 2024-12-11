@@ -52,6 +52,7 @@ class EloquentProductRepository implements ProductRepositoryInterface
                 'name' => $product->name,
                 'price' => $product->price,
                 'quantity' => $product->quantity,
+                'cartQuantity' => $product->cartQuantity,
                 'updated_at' => now(),
             ]);
     }
