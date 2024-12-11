@@ -4,24 +4,15 @@ namespace App\Domain\Product;
 
 use App\Domain\Shared\ValueObjects\UuidVO;
 
-final class Product
+class Product
 {
     public function __construct(
         public UuidVO $id,
         public string $name,
         public float $price,
-        public int $quantity
+        public int $quantity,
+        public int $cartQuantity = 0
     ) {}
-
-    public static function create(array $data): self
-    {
-        return new self(
-            UuidVO::fromString($data['id']),
-            $data['name'],
-            $data['price'],
-            $data['quantity']
-        );
-    }
 
     public static function fromDatabase(object $data): self
     {
@@ -29,7 +20,18 @@ final class Product
             UuidVO::fromString($data->id),
             $data->name,
             $data->price,
-            $data->quantity
+            $data->quantity,
+            $data->cartQuantity ?? 0
         );
+    }
+
+    public function decreaseStock(int $quantity): void
+    {
+        $this->quantity -= $quantity;
+    }
+
+    public function increaseStock(int $quantity): void
+    {
+        $this->quantity += $quantity;
     }
 }

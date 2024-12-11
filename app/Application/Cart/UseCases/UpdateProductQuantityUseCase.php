@@ -17,19 +17,30 @@ readonly class UpdateProductQuantityUseCase
 
     /**
      * @throws CartNotFoundException
+     * @throws InsufficientStockException
      */
     public function execute(string $cartId, string $productId, int $newQuantity): void
     {
-        $uuidProduct = UUidVO::fromString($productId);
+        $uuidProduct = UuidVO::fromString($productId);
         $product = $this->productRepository->findByIdOrFail($uuidProduct);
         $cart = $this->cartRepository->findByIdOrFail(UuidVO::fromString($cartId));
 
-        if ($product->quantity < $newQuantity) {
+        $currentQuantity = $cart->getProductStock($uuidProduct);
+
+        $difference = $newQuantity - $currentQuantity;
+
+        if ($difference > 0 && $product->quantity < $difference) {
             throw new InsufficientStockException($productId);
         }
 
         $cart->updateProductQuantity($uuidProduct, $newQuantity);
+
+        if ($difference > 0) {
+            $this->productRepository->updateStock($uuidProduct, $difference);
+        } elseif ($difference < 0) {
+            $this->productRepository->increaseStock($uuidProduct, abs($difference));
+        }
+
         $this->cartRepository->save($cart);
-        $this->productRepository->updateStock($product->id, $newQuantity);
     }
 }

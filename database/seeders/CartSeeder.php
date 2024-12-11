@@ -15,29 +15,29 @@ class CartSeeder extends Seeder
      */
     public function run(): void
     {
-        // Ejecutar ProductSeeder y obtener los productos
         $productSeeder = App::make(ProductSeeder::class);
         $products = $productSeeder->run();
 
-        // Crear carritos usando productos existentes
+        // Establecer la cantidad específica para los productos en el carrito
         $productsCart1 = [
-            $products[0], // Gafas de Sol Deportivas
-            $products[1], // Chaqueta Deportiva
+            $this->prepareProductForCart($products[0], 2), // Gafas de Sol Deportivas
+            $this->prepareProductForCart($products[1], 1), // Chaqueta Deportiva
         ];
 
         $productsCart2 = [
-            $products[2], // Zapatillas de Running
-            $products[3], // Camiseta Técnica
+            $this->prepareProductForCart($products[2], 3), // Zapatillas de Running
+            $this->prepareProductForCart($products[3], 2), // Camiseta Técnica
         ];
 
         $carts = [
             [
                 'id' => (string) Uuid::uuid4(),
                 'items' => json_encode(array_map(fn($product) => [
-                    'id' => $product['id'],
+                    'id' => (string) $product['id'],
                     'name' => $product['name'],
                     'price' => $product['price'],
-                    'quantity' => 1,
+                    'quantity' => $product['quantity'],
+                    'cartQuantity' => $product['cartQuantity'],
                 ], $productsCart1)),
                 'created_at' => new DateTime(),
                 'updated_at' => new DateTime(),
@@ -45,10 +45,11 @@ class CartSeeder extends Seeder
             [
                 'id' => (string) Uuid::uuid4(),
                 'items' => json_encode(array_map(fn($product) => [
-                    'id' => $product['id'],
+                    'id' => (string) $product['id'],
                     'name' => $product['name'],
                     'price' => $product['price'],
-                    'quantity' => 1,
+                    'quantity' => $product['quantity'],
+                    'cartQuantity' => $product['cartQuantity'],
                 ], $productsCart2)),
                 'created_at' => new DateTime(),
                 'updated_at' => new DateTime(),
@@ -56,5 +57,12 @@ class CartSeeder extends Seeder
         ];
 
         DB::table('carts')->insert($carts);
+    }
+
+    private function prepareProductForCart($product, int $cartQuantity)
+    {
+        $product['cartQuantity'] = $cartQuantity;
+        $product['quantity'] -= $cartQuantity;
+        return $product;
     }
 }

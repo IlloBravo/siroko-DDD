@@ -23,7 +23,7 @@
                     <ul>
                         @foreach ($cart->items as $item)
                             <li>
-                                <strong>{{ $item->name }}</strong> - {{ __('Cart.price') }}: {{ $item->price }} € - {{ __('Cart.quantity') }}: {{ $item->quantity }}
+                                <strong>{{ $item->name }}</strong> - {{ __('Cart.price') }}: {{ $item->price }} € - {{ __('Cart.quantity') }}: {{ $item->cartQuantity }}
                             </li>
                         @endforeach
                     </ul>

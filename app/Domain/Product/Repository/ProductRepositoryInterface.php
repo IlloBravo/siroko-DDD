@@ -13,4 +13,5 @@ interface ProductRepositoryInterface
      */
     public function findByIdOrFail(UuidVO $id): Product;
     public function findAll(): array;
+    public function increaseStock(UuidVO $productId, int $quantity): void;
 }

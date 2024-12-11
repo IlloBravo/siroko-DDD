@@ -23,6 +23,7 @@ class EloquentCartRepository implements CartRepositoryInterface
                         'name' => $item->name,
                         'price' => $item->price,
                         'quantity' => $item->quantity,
+                        'cartQuantity' => $item->cartQuantity
                     ];
                 })->values()->all()),
                 'created_at' => $cart->createdAt,

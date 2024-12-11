@@ -49,27 +49,45 @@ final class Cart
 
     public function addProduct(Product $product, int $quantity): void
     {
-        $productWithQuantity = clone $product;
-        $productWithQuantity->quantity = $quantity;
+        $product->decreaseStock($quantity);
 
-        $this->items->push($productWithQuantity);
+        $productInCart = clone $product;
+        $productInCart->cartQuantity = $quantity;
+
+        $this->items->push($productInCart);
         $this->updatedAt = new DateTime();
     }
 
-    public function updateProductQuantity(UuidVO $productId, int $quantity): void
+    public function updateProductQuantity(UuidVO $productId, int $newQuantity): void
     {
-        $this->items = $this->items->map(function (Product $item) use ($productId, $quantity) {
+        $this->items = $this->items->map(function (Product $item) use ($productId, $newQuantity) {
             if ($item->id->equals($productId)) {
-                $item->quantity = $quantity;
+                $difference = $newQuantity - $item->cartQuantity;
+
+                if ($difference > 0) {
+                    $item->decreaseStock($difference);
+                } elseif ($difference < 0) {
+                    $item->increaseStock(abs($difference));
+                }
+
+                $item->cartQuantity = $newQuantity;
             }
             return $item;
         });
+
         $this->updatedAt = new DateTime();
     }
 
     public function removeProduct(UuidVO $productId): void
     {
-        $this->items = $this->items->reject(fn(Product $item) => $item->id->equals($productId));
+        $this->items = $this->items->reject(function (Product $item) use ($productId) {
+            if ($item->id->equals($productId)) {
+                $item->increaseStock($item->cartQuantity);
+                return true;
+            }
+            return false;
+        });
+
         $this->updatedAt = new DateTime();
     }
 
@@ -82,5 +100,12 @@ final class Cart
     {
         $this->items = collect();
         $this->updatedAt = new DateTime();
+    }
+
+    public function getProductStock(UuidVO $productId): int
+    {
+        $product = $this->items->first(fn(Product $item) => $item->id->equals($productId));
+
+        return $product->quantity;
     }
 }
