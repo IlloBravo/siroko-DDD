@@ -10,3 +10,5 @@ Route::prefix('cart/{cartId}')->group(function () {
     Route::get('/products/count', [CartController::class, 'getTotalProducts'])->name('api.cart.getTotalProducts');
     Route::post('/checkout', [CartController::class, 'checkout'])->name('api.cart.checkout');
 });
+
+Route::post('/create-cart', [CartController::class, 'createCart'])->name('api.cart.createCart');

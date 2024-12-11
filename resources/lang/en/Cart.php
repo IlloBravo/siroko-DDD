@@ -27,4 +27,6 @@ return [
     'order_success' => 'Your order has been placed successfully.',
     'continue_shopping' => 'Continue Shopping',
     'go_to_products' => 'Go To Products',
+    'all_products' => 'All Products',
+    'all_carts' => 'All Carts',
 ];

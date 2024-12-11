@@ -16,13 +16,9 @@ class ProductController extends Controller
     public function index(): View
     {
         $products = $this->productRepository->findAll();
-        $carts = $this->cartRepository->findAll();
 
-        $cartId = session('cart_id'); // Asumimos que el cartId está almacenado en la sesión
+        $cartId = session('cart_id');
 
-        return view('cart.index',
-            compact('products', 'cartId'),
-        compact('carts')
-        );
+        return view('product.index', compact('products', 'cartId'));
     }
 }

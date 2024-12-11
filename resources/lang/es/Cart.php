@@ -27,4 +27,6 @@ return [
     'order_success' => 'Tu pedido se ha realizado con éxito.',
     'continue_shopping' => 'Seguir Comprando',
     'go_to_products' => 'Productos disponibles',
+    'all_products' => 'Todos los Productos',
+    'all_carts' => 'Todos los Carritos'
 ];

@@ -39,7 +39,4 @@
         @csrf
         <button type="submit" class="btn btn-success">{{ __('Cart.checkout') }}</button>
     </form>
-
-    <a href="{{ url('/products') }}" class="btn btn-secondary mt-3">{{ __('Cart.go_to_products') }}</a>
-
 @endsection

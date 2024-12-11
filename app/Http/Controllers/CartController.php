@@ -7,15 +7,19 @@ use App\Application\Cart\UseCases\UpdateProductQuantityUseCase;
 use App\Application\Cart\UseCases\RemoveProductFromCartUseCase;
 use App\Application\Cart\UseCases\GetTotalProductsUseCase;
 use App\Application\Cart\UseCases\CheckoutCartUseCase;
+use App\Domain\Cart\Cart;
 use App\Domain\Cart\Exceptions\CartNotFoundException;
 use App\Domain\Cart\Repository\CartRepositoryInterface;
 use App\Domain\Product\Exceptions\ProductNotFoundException;
 use App\Domain\Product\Repository\ProductRepositoryInterface;
 use App\Domain\Shared\ValueObjects\UuidVO;
+use DateMalformedStringException;
 use Exception;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\View\View;
+use Ramsey\Uuid\Uuid;
 
 class CartController extends Controller
 {
@@ -104,6 +108,15 @@ class CartController extends Controller
         ]);
     }
 
+    public function index(): View
+    {
+        $carts = $this->cartRepository->findAll();
+
+        $cartId = session('cart_id');
+
+        return view('cart.index', compact('cartId', 'carts'));
+    }
+
     public function show(string $cartId): View
     {
         $cart = $this->cartRepository->findByIdOrFail(UuidVO::fromString($cartId));
@@ -115,4 +128,25 @@ class CartController extends Controller
         return view('cart.thankyou');
     }
 
+    /**
+     * @throws DateMalformedStringException
+     */
+    public function createCart(Request $request): View
+    {
+        // FALTA POR DESARROLLAR QUE AL CREAR EL CARRITO, SE AÑADE EL PRODUCTO AL CREARLO
+        $cartId = (string) Uuid::uuid4();
+
+        $cart = Cart::create([
+            'id' => $cartId,
+            'items' => json_encode([]),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $this->cartRepository->save($cart);
+
+        $request->session()->put('cart_id', $cartId);
+
+        return view('cart.confirmation', ['cartId' => $cartId]);
+    }
 }
