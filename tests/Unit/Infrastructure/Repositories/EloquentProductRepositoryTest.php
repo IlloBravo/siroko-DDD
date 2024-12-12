@@ -29,7 +29,7 @@ class EloquentProductRepositoryTest extends TestCase
             'id' => (string) $product->id,
             'name' => $product->name,
             'price' => $product->price,
-            'quantity' => $product->quantity,
+            'quantity' => $product->stock,
             'cartQuantity' => $product->cartQuantity,
             'updated_at' => now(),
         ]);
@@ -113,7 +113,7 @@ class EloquentProductRepositoryTest extends TestCase
             'id' => (string) $product->id,
             'name' => $product->name,
             'price' => $product->price,
-            'quantity' => $product->quantity,
+            'quantity' => $product->stock,
             'cartQuantity' => $product->cartQuantity,
             'updated_at' => now(),
         ]);

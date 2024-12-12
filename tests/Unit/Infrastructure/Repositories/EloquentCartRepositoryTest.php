@@ -43,7 +43,7 @@ class EloquentCartRepositoryTest extends TestCase
                 'id' => (string) $product->id,
                 'name' => $product->name,
                 'price' => $product->price,
-                'quantity' => $product->quantity,
+                'quantity' => $product->stock,
                 'cartQuantity' => $product->cartQuantity,
             ]
         ]), $cartData->items);
@@ -77,7 +77,7 @@ class EloquentCartRepositoryTest extends TestCase
                     'id' => (string) $product->id,
                     'name' => $product->name,
                     'price' => $product->price,
-                    'quantity' => $product->quantity,
+                    'quantity' => $product->stock,
                     'cartQuantity' => $product->cartQuantity,
                 ]
             ]),
@@ -130,7 +130,7 @@ class EloquentCartRepositoryTest extends TestCase
                     'id' => (string) $product->id,
                     'name' => $product->name,
                     'price' => $product->price,
-                    'quantity' => $product->quantity,
+                    'quantity' => $product->stock,
                     'cartQuantity' => $product->cartQuantity,
                 ]
             ]),
@@ -172,7 +172,7 @@ class EloquentCartRepositoryTest extends TestCase
                     'id' => (string) $product1->id,
                     'name' => $product1->name,
                     'price' => $product1->price,
-                    'quantity' => $product1->quantity,
+                    'quantity' => $product1->stock,
                     'cartQuantity' => $product1->cartQuantity,
                 ]
             ]),
@@ -203,7 +203,7 @@ class EloquentCartRepositoryTest extends TestCase
                     'id' => (string) $product2->id,
                     'name' => $product2->name,
                     'price' => $product2->price,
-                    'quantity' => $product2->quantity,
+                    'quantity' => $product2->stock,
                     'cartQuantity' => $product2->cartQuantity,
                 ]
             ]),

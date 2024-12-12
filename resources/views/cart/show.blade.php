@@ -18,7 +18,7 @@
             </tr>
             </thead>
             <tbody>
-            @foreach ($cart->items as $product)
+            @foreach ($cart->products as $product)
                 <tr>
                     <td>{{ $product->name }}</td>
                     <td>

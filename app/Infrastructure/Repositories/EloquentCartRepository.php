@@ -41,12 +41,12 @@ class EloquentCartRepository implements CartRepositoryInterface
         DB::table('carts')->updateOrInsert(
             ['id' => (string) $cart->id],
             [
-                'items' => json_encode($cart->items->map(function (Product $item) {
+                'items' => json_encode($cart->products->map(function (Product $item) {
                     return [
                         'id' => (string) $item->id,
                         'name' => $item->name,
                         'price' => $item->price,
-                        'quantity' => $item->quantity,
+                        'stock' => $item->stock,
                         'cartQuantity' => $item->cartQuantity
                     ];
                 })->values()->all()),

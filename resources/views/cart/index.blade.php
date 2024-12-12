@@ -21,9 +21,9 @@
                 <td>{{ $cart->updatedAt->format('Y-m-d H:i') }}</td>
                 <td>
                     <ul>
-                        @foreach ($cart->items as $item)
+                        @foreach ($cart->products as $product)
                             <li>
-                                <strong>{{ $item->name }}</strong> - {{ __('Cart.price') }}: {{ $item->price }} € - {{ __('Cart.quantity') }}: {{ $item->cartQuantity }}
+                                <strong>{{ $product->name }}</strong> - {{ __('Cart.price') }}: {{ $product->price }} € - {{ __('Cart.quantity') }}: {{ $product->cartQuantity }}
                             </li>
                         @endforeach
                     </ul>

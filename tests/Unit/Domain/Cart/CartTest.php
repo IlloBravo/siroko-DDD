@@ -36,10 +36,10 @@ class CartTest extends TestCase
         $cart->addProduct($product, 2);
 
         $this->assertEquals(1, $cart->items->count());
-        $this->assertEquals(8, $product->quantity);
+        $this->assertEquals(8, $product->stock);
 
         $cart->addProduct($product, 3);
-        $this->assertEquals(5, $product->quantity);
+        $this->assertEquals(5, $product->stock);
         $this->assertEquals(5, $cart->getProductQuantity(UuidVO::fromString($product->id)));
     }
 
@@ -68,11 +68,11 @@ class CartTest extends TestCase
         $cart->addProduct($product, 2);
         $cart->updateProductQuantity(UuidVO::fromString($product->id), 4);
 
-        $this->assertEquals(6, $product->quantity);
+        $this->assertEquals(6, $product->stock);
         $this->assertEquals(4, $cart->getProductQuantity(UuidVO::fromString($product->id)));
 
         $cart->updateProductQuantity(UuidVO::fromString($product->id), 1);
-        $this->assertEquals(9, $product->quantity);
+        $this->assertEquals(9, $product->stock);
         $this->assertEquals(1, $cart->getProductQuantity(UuidVO::fromString($product->id)));
     }
 
@@ -104,7 +104,7 @@ class CartTest extends TestCase
 
         $cart->removeProduct(UuidVO::fromString($product->id));
 
-        $this->assertEquals(20, $product->quantity);
+        $this->assertEquals(20, $product->stock);
         $this->assertEquals(0, $cart->getProductQuantity(UuidVO::fromString($product->id)));
     }
 

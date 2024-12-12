@@ -48,6 +48,6 @@ class AddProductToCartUseCaseTest extends TestCase
         $useCase->execute($cart, $product, 5);
 
         $this->assertEquals(5, $cart->getProductQuantity(UuidVO::fromString($product->id)));
-        $this->assertEquals(5, $product->quantity);
+        $this->assertEquals(5, $product->stock);
     }
 }

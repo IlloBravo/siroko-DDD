@@ -10,9 +10,9 @@ class Product
     public function __construct(
         public UuidVO $id,
         public string $name,
-        public float $price,
-        public int $quantity,
-        public int $cartQuantity = 0
+        public float  $price,
+        public int    $stock,
+        public int    $cartQuantity = 0
     ) {}
 
     public static function fromDatabase(object $data): self
@@ -21,23 +21,23 @@ class Product
             UuidVO::fromString($data->id),
             $data->name,
             $data->price,
-            $data->quantity,
+            $data->stock,
             $data->cartQuantity ?? 0
         );
     }
 
     public function decreaseStock(int $quantity): void
     {
-        if ($this->quantity < $quantity) {
+        if ($this->stock < $quantity) {
             throw new InsufficientStockException((string) $this->id);
         }
         $this->cartQuantity += $quantity;
-        $this->quantity -= $quantity;
+        $this->stock -= $quantity;
     }
 
     public function increaseStock(int $quantity): void
     {
-        $this->quantity += $quantity;
+        $this->stock += $quantity;
     }
 
     public function decreaseCartQuantity(int $quantity): void

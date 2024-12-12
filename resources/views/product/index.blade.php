@@ -26,10 +26,10 @@
                 <tr>
                     <td>{{ $product->name }}</td>
                     <td>{{ $product->price }}</td>
-                    <td>{{ $product->quantity }}</td>
+                    <td>{{ $product->stock }}</td>
                     <td>
-                        <input type="hidden" name="products[{{ $product->id }}][id]" value="{{ $product->id }}">
-                        <input type="number" name="products[{{ $product->id }}][quantity]" min="0" max="{{ $product->quantity }}" class="form-control w-50" value="0">
+                        <input type="hidden" name="products[{{ $loop->index }}][id]" value="{{ $product->id }}">
+                        <input type="number" name="products[{{ $loop->index }}][quantity]" min="0" max="{{ $product->stock }}" class="form-control w-50" value="0">
                     </td>
                 </tr>
             @endforeach
@@ -37,6 +37,7 @@
         </table>
         <button type="submit" class="btn btn-primary mt-3">{{ __('Cart.add_to_cart') }}</button>
     </form>
+
 
     <div id="cart-button-container" class="mt-4" style="display: none;">
         <a id="view-cart-button" href="#" class="btn btn-success">{{ __('Cart.view_cart') }}</a>
@@ -48,26 +49,41 @@
         $(document).ready(function () {
             $('#add-to-cart-form').on('submit', function (e) {
                 e.preventDefault();
+
                 const cartId = $(this).data('cart-id');
+
+                const formData = $(this).serializeArray();
+
+                const payload = {
+                    cart_id: cartId,
+                    products: []
+                };
+
+                let currentProduct = {};
+                formData.forEach((field) => {
+                    if (field.name.includes('[id]')) {
+                        currentProduct = { id: field.value };
+                    }
+                    if (field.name.includes('[quantity]')) {
+                        currentProduct.quantity = parseInt(field.value, 10);
+                        payload.products.push(currentProduct);
+                    }
+                });
 
                 $.ajax({
                     url: '{{ route('api.cart.addProduct', ['cartId' => ':cartId']) }}'.replace(':cartId', cartId),
                     method: 'POST',
-                    data: $(this).serialize(),
+                    data: JSON.stringify(payload),
+                    contentType: 'application/json',
                     success: function (response) {
-                        if (response.message && response.cartId) {
-                            $('#alert-container').html('<div class="alert alert-success">' + response.message + '</div>');
-                            $('#view-cart-button').attr('href', '/cart/' + response.cartId + '/view');
-                            $('#cart-button-container').show();
-                        } else {
-                            $('#alert-container').html('<div class="alert alert-danger">Error en la respuesta del servidor.</div>');
-                        }
+                        $('#alert-container').html('<div class="alert alert-success">' + response.message + '</div>');
                     },
-                    error: function (xhr) {
+                    error: function () {
                         $('#alert-container').html('<div class="alert alert-danger">{{ __('Cart.add_product_error') }}</div>');
                     }
                 });
             });
+
         });
     </script>
 @endsection

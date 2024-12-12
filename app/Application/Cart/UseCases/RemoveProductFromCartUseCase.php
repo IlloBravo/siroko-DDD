@@ -20,12 +20,18 @@ readonly class RemoveProductFromCartUseCase
     public function execute(string $cartId, string $productId): void
     {
         $uuidProduct = UuidVO::fromString($productId);
+
         $cart = $this->cartRepository->findByIdOrFail(UuidVO::fromString($cartId));
 
         $quantityRemoved = $cart->getProductQuantity($uuidProduct);
+
         $cart->removeProduct($uuidProduct);
+
+        $cart->products->reject()->contains($uuidProduct);
+
         $this->cartRepository->save($cart);
 
         $this->productRepository->increaseStock($uuidProduct, $quantityRemoved);
     }
+
 }

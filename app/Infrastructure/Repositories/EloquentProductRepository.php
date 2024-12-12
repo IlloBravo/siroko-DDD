@@ -37,9 +37,23 @@ class EloquentProductRepository implements ProductRepositoryInterface
             ->update([
                 'name' => $product->name,
                 'price' => $product->price,
-                'quantity' => $product->quantity,
+                'stock' => $product->stock,
                 'cartQuantity' => $product->cartQuantity,
-                'updated_at' => now(),
+            ]);
+    }
+
+    public function increaseStock(UuidVO $productId, int $quantity): void
+    {
+        $productData = DB::table('products')->where('id', (string) $productId)->first();
+
+        if (!$productData) {
+            throw new ProductNotFoundException((string) $productId);
+        }
+
+        DB::table('products')
+            ->where('id', (string) $productId)
+            ->update([
+                'stock' => $productData->stock + $quantity,
             ]);
     }
 }

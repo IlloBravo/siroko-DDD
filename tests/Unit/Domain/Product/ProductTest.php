@@ -22,7 +22,7 @@ class ProductTest extends TestCase
         $this->assertEquals('123e4567-e89b-12d3-a456-426614174001', $product->id->__toString());
         $this->assertEquals('Producto A', $product->name);
         $this->assertEquals(10.5, $product->price);
-        $this->assertEquals(100, $product->quantity);
+        $this->assertEquals(100, $product->stock);
         $this->assertEquals(0, $product->cartQuantity);
     }
 
@@ -40,7 +40,7 @@ class ProductTest extends TestCase
 
         $product->decreaseStock(10);
 
-        $this->assertEquals(90, $product->quantity);
+        $this->assertEquals(90, $product->stock);
     }
 
     public function testIncreaseStock()
@@ -57,7 +57,7 @@ class ProductTest extends TestCase
 
         $product->increaseStock(15);
 
-        $this->assertEquals(115, $product->quantity);
+        $this->assertEquals(115, $product->stock);
     }
 
     public function testFromDatabase()

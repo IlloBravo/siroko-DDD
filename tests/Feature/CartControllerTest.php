@@ -86,7 +86,7 @@ class CartControllerTest extends TestCase
         $response->assertSessionHas('success', __('Cart.cart_updated'));
 
         $cart = $cartRepository->findByIdOrFail(UuidVO::fromString($cartId));
-        $items = json_decode($cart->items, true);
+        $items = json_decode($cart->products, true);
 
         $this->assertEquals(5, $items[0]['cartQuantity']);
     }
@@ -119,7 +119,7 @@ class CartControllerTest extends TestCase
         $response->assertSessionHas('error', 'Stock insuficiente para el Producto con ID ' . $productId);
 
         $cart = $cartRepository->findByIdOrFail(UuidVO::fromString($cartId));
-        $items = json_decode($cart->items, true);
+        $items = json_decode($cart->products, true);
 
         $this->assertNotEquals($products[0]->quantity + 1, $items[0]['cartQuantity']);
     }
@@ -151,7 +151,7 @@ class CartControllerTest extends TestCase
 
         $cart = $cartRepository->findByIdOrFail(UuidVO::fromString($cartId));
 
-        $items = json_decode($cart->items, true);
+        $items = json_decode($cart->products, true);
 
         $this->assertNotContains($productId, array_column($items, 'id'));
     }
@@ -197,7 +197,7 @@ class CartControllerTest extends TestCase
         $response->assertSessionHas('success', __('Cart.cart_checked_out'));
 
         $cart = $cartRepository->findByIdOrFail(UuidVO::fromString($cartId));
-        $emptyItemsFromCart = json_decode($cart->items, true);
+        $emptyItemsFromCart = json_decode($cart->products, true);
 
         $this->assertEmpty($emptyItemsFromCart);
     }
