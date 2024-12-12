@@ -7,20 +7,17 @@ use App\Application\Cart\UseCases\UpdateProductQuantityUseCase;
 use App\Application\Cart\UseCases\RemoveProductFromCartUseCase;
 use App\Application\Cart\UseCases\GetTotalProductsUseCase;
 use App\Application\Cart\UseCases\CheckoutCartUseCase;
-use App\Domain\Cart\Cart;
 use App\Domain\Cart\Exceptions\CartNotFoundException;
 use App\Domain\Cart\Repository\CartRepositoryInterface;
 use App\Domain\Product\Exceptions\InsufficientStockException;
 use App\Domain\Product\Exceptions\ProductNotFoundException;
 use App\Domain\Product\Repository\ProductRepositoryInterface;
 use App\Domain\Shared\ValueObjects\UuidVO;
-use DateMalformedStringException;
 use Exception;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\View\View;
-use Ramsey\Uuid\Uuid;
 
 class CartController extends Controller
 {
@@ -38,16 +35,21 @@ class CartController extends Controller
      * @throws ProductNotFoundException
      * @throws CartNotFoundException
      */
-    public function addProduct(Request $request): JsonResponse
+    public function addProduct(Request $request, string $cartId): JsonResponse
     {
-        $product = $this->productRepository->findByIdOrFail( UuidVO::fromString($request->input('id')));
-        $cart = $this->cartRepository->findByIdOrFail(UuidVO::fromString($request->input('cart_id')));
+        $cart = $this->cartRepository->findByIdOrFail(UuidVO::fromString($cartId));
 
-        $this->addProductToCartUseCase->execute(
-            $cart,
-            $product,
-            $request->input('quantity')
-        );
+        $products = $request->get('products');
+
+        foreach ($products as $product) {
+            if ($product['quantity'] > 0) {
+                $this->addProductToCartUseCase->execute(
+                    $cart,
+                    $this->productRepository->findByIdOrFail(UuidVO::fromString($product['id'])),
+                    $product['quantity']
+                );
+            }
+        }
 
         return response()->json([
             'message' => __('Cart.products_added')
@@ -120,9 +122,7 @@ class CartController extends Controller
     {
         $carts = $this->cartRepository->findAll();
 
-        $cartId = session('cart_id');
-
-        return view('cart.index', compact('cartId', 'carts'));
+        return view('cart.index', compact('carts'));
     }
 
     public function show(string $cartId): View
@@ -134,41 +134,5 @@ class CartController extends Controller
     public function thankYou(): View
     {
         return view('cart.thankyou');
-    }
-
-    /**
-     * @throws DateMalformedStringException
-     */
-    public function createCart(Request $request): JsonResponse
-    {
-        $cartId = (string) Uuid::uuid4();
-
-        $cart = Cart::create([
-            'id' => $cartId,
-            'items' => json_encode([]),
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-
-        $this->cartRepository->save($cart);
-
-        $products = $request->input('products');
-
-        foreach ($products as $productData) {
-            $productId = UuidVO::fromString($productData['id']);
-            $quantity = (int) $productData['quantity'];
-
-            if ($quantity > 0) {
-                $product = $this->productRepository->findByIdOrFail($productId);
-                $this->addProductToCartUseCase->execute($cart, $product, $quantity);
-            }
-        }
-
-        $this->cartRepository->save($cart);
-
-        return response()->json([
-            'message' => __('Cart.cart_created_with_product'),
-            'cartId' => $cartId
-        ]);
     }
 }

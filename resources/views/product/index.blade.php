@@ -10,7 +10,7 @@
 
     <div id="alert-container"></div>
 
-    <form id="add-to-cart-form">
+    <form id="add-to-cart-form" data-cart-id="{{ $cart->id }}">
         @csrf
         <table class="table table-striped">
             <thead>
@@ -48,9 +48,10 @@
         $(document).ready(function () {
             $('#add-to-cart-form').on('submit', function (e) {
                 e.preventDefault();
+                const cartId = $(this).data('cart-id');
 
                 $.ajax({
-                    url: '{{ route('api.cart.createCart') }}',
+                    url: '{{ route('api.cart.addProduct', ['cartId' => ':cartId']) }}'.replace(':cartId', cartId),
                     method: 'POST',
                     data: $(this).serialize(),
                     success: function (response) {

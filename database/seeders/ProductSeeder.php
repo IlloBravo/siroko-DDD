@@ -2,9 +2,9 @@
 
 namespace Database\Seeders;
 
+use App\Domain\Shared\ValueObjects\UuidVO;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 
 class ProductSeeder extends Seeder
 {
@@ -15,35 +15,35 @@ class ProductSeeder extends Seeder
     {
         $products = [
             [
-                'id' => (string) Str::uuid(),
+                'id' => UuidVO::generate(),
                 'name' => 'Gafas de Sol Deportivas',
                 'price' => 59.99,
                 'quantity' => 10,
                 'cartQuantity' => 0,
             ],
             [
-                'id' => (string) Str::uuid(),
+                'id' => UuidVO::generate(),
                 'name' => 'Chaqueta Deportiva',
                 'price' => 129.99,
                 'quantity' => 5,
                 'cartQuantity' => 0,
             ],
             [
-                'id' => (string) Str::uuid(),
+                'id' => UuidVO::generate(),
                 'name' => 'Zapatillas de Running',
                 'price' => 89.99,
                 'quantity' => 15,
                 'cartQuantity' => 0,
             ],
             [
-                'id' => (string) Str::uuid(),
+                'id' => UuidVO::generate(),
                 'name' => 'Camiseta Técnica',
                 'price' => 29.99,
                 'quantity' => 20,
                 'cartQuantity' => 0,
             ],
             [
-                'id' => (string) Str::uuid(),
+                'id' => UuidVO::generate(),
                 'name' => 'Pantalones Cortos Deportivos',
                 'price' => 39.99,
                 'quantity' => 12,

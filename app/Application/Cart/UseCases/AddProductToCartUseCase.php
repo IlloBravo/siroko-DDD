@@ -22,6 +22,6 @@ readonly class AddProductToCartUseCase
     {
         $cart->addProduct($product, $quantity);
         $this->cartRepository->save($cart);
-        $this->productRepository->updateStock($product->id, $quantity);
+        $this->productRepository->save($product);
     }
 }

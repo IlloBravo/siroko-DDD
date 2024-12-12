@@ -21,20 +21,6 @@ class EloquentProductRepository implements ProductRepositoryInterface
         return Product::fromDatabase($productData);
     }
 
-    public function updateStock(UuidVO $productId, int $quantity): void
-    {
-        DB::table('products')
-            ->where('id', (string) $productId)
-            ->decrement('quantity', $quantity);
-    }
-
-    public function increaseStock(UuidVO $productId, int $quantity): void
-    {
-        DB::table('products')
-            ->where('id', (string) $productId)
-            ->increment('quantity', $quantity);
-    }
-
     public function findAll(): array
     {
         $productsData = DB::table('products')->get();

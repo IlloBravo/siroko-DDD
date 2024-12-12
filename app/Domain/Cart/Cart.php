@@ -20,21 +20,6 @@ final class Cart
     /**
      * @throws DateMalformedStringException
      */
-    public static function create(array $data): self
-    {
-        return new self(
-            UuidVO::fromString($data['id']),
-            collect(json_decode($data['items'], true))->map(
-                fn($item) => Product::fromDatabase((object) $item)
-            ),
-            new DateTime($data['created_at']),
-            new DateTime($data['updated_at'])
-        );
-    }
-
-    /**
-     * @throws DateMalformedStringException
-     */
     public static function fromDatabase(object $data): self
     {
         return new self(
@@ -49,13 +34,13 @@ final class Cart
 
     public function addProduct(Product $product, int $quantity): void
     {
+        $existingProduct = $this->items->first(fn(Product $item) => $item->id->equals($product->id));
+
         $product->decreaseStock($quantity);
 
-        $existingItem = $this->items->first(fn(Product $item) => $item->id->equals($product->id));
-        if ($existingItem) {
-            $existingItem->cartQuantity += $quantity;
+        if ($existingProduct) {
+            $existingProduct->cartQuantity += $quantity;
         } else {
-            $product->cartQuantity = $quantity;
             $this->items->push($product);
         }
 

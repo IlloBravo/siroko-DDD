@@ -31,12 +31,22 @@ class Product
         if ($this->quantity < $quantity) {
             throw new InsufficientStockException((string) $this->id);
         }
-
+        $this->cartQuantity += $quantity;
         $this->quantity -= $quantity;
     }
 
     public function increaseStock(int $quantity): void
     {
         $this->quantity += $quantity;
+    }
+
+    public function decreaseCartQuantity(int $quantity): void
+    {
+        $this->cartQuantity -= $quantity;
+    }
+
+    public function increaseCartQuantity(int $quantity): void
+    {
+        $this->cartQuantity += $quantity;
     }
 }
