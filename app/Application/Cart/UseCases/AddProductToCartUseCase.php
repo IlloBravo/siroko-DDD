@@ -2,26 +2,26 @@
 
 namespace App\Application\Cart\UseCases;
 
+use App\Domain\Cart\Cart;
+use App\Domain\Cart\Exceptions\CartNotFoundException;
 use App\Domain\Cart\Repository\CartRepositoryInterface;
 use App\Domain\Product\Product;
-use Exception;
+use App\Domain\Product\Repository\ProductRepositoryInterface;
 
 readonly class AddProductToCartUseCase
 {
-    public function __construct(private CartRepositoryInterface $cartRepository) {}
+    public function __construct(
+        private CartRepositoryInterface $cartRepository,
+        private ProductRepositoryInterface $productRepository
+    ) {}
 
     /**
-     * @throws Exception
+     * @throws CartNotFoundException
      */
-    public function execute(string $cartId, Product $product): void
+    public function execute(Cart $cart, Product $product, int $quantity): void
     {
-        $cart = $this->cartRepository->findById($cartId);
-
-        if (!$cart) {
-            throw new Exception("Cart not found.");
-        }
-
-        $cart->addProduct($product);
+        $cart->addProduct($product, $quantity);
         $this->cartRepository->save($cart);
+        $this->productRepository->updateStock($product->id, $quantity);
     }
 }

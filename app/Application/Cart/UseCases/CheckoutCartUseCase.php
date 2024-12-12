@@ -2,24 +2,20 @@
 
 namespace App\Application\Cart\UseCases;
 
+use App\Domain\Cart\Exceptions\CartNotFoundException;
 use App\Domain\Cart\Repository\CartRepositoryInterface;
-use Exception;
+use App\Domain\Shared\ValueObjects\UuidVO;
 
 readonly class CheckoutCartUseCase
 {
     public function __construct(private CartRepositoryInterface $cartRepository) {}
 
     /**
-     * @throws Exception
+     * @throws CartNotFoundException
      */
     public function execute(string $cartId): void
     {
-        $cart = $this->cartRepository->findById($cartId);
-
-        if (!$cart) {
-            throw new Exception("Cart not found.");
-        }
-
+        $cart = $this->cartRepository->findByIdOrFail(UuidVO::fromString($cartId));
         $cart->checkout();
         $this->cartRepository->save($cart);
     }

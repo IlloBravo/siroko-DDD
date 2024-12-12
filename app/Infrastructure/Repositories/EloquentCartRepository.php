@@ -3,10 +3,11 @@
 namespace App\Infrastructure\Repositories;
 
 use App\Domain\Cart\Cart;
+use App\Domain\Cart\Exceptions\CartNotFoundException;
 use App\Domain\Cart\Repository\CartRepositoryInterface;
 use App\Domain\Product\Product;
+use App\Domain\Shared\ValueObjects\UuidVO;
 use DateMalformedStringException;
-use DateTime;
 use Illuminate\Support\Facades\DB;
 
 class EloquentCartRepository implements CartRepositoryInterface
@@ -14,9 +15,17 @@ class EloquentCartRepository implements CartRepositoryInterface
     public function save(Cart $cart): void
     {
         DB::table('carts')->updateOrInsert(
-            ['id' => $cart->id],
+            ['id' => (string) $cart->id],
             [
-                'items' => json_encode($cart->items),
+                'items' => json_encode($cart->items->map(function (Product $item) {
+                    return [
+                        'id' => (string) $item->id,
+                        'name' => $item->name,
+                        'price' => $item->price,
+                        'quantity' => $item->quantity,
+                        'cartQuantity' => $item->cartQuantity
+                    ];
+                })->values()->all()),
                 'created_at' => $cart->createdAt,
                 'updated_at' => $cart->updatedAt,
             ]
@@ -26,33 +35,30 @@ class EloquentCartRepository implements CartRepositoryInterface
     /**
      * @throws DateMalformedStringException
      */
-    public function findById(string $id): ?Cart
+    public function findByIdOrFail(UuidVO $id): Cart
     {
-        $cartData = DB::table('carts')->where('id', $id)->first();
+        $uuid = UuidVO::fromString($id);
+
+        $cartData = DB::table('carts')->where('id', $uuid)->first();
 
         if (!$cartData) {
-            return null;
+            throw new CartNotFoundException($id);
         }
 
-        $items = collect(json_decode($cartData->items, true))->map(function ($item) {
-            return new Product(
-                $item['id'],
-                $item['name'],
-                $item['price'],
-                $item['quantity']
-            );
-        });
-
-        return new Cart(
-            $cartData->id,
-            $items,
-            new DateTime($cartData->created_at),
-            new DateTime($cartData->updated_at)
-        );
+        return Cart::fromDatabase($cartData);
     }
 
     public function delete(string $id): void
     {
         DB::table('carts')->where('id', $id)->delete();
+    }
+
+    public function findAll(): array
+    {
+        $cartsData = DB::table('carts')->get();
+
+        return $cartsData->map(function ($cartData) {
+            return Cart::fromDatabase((object) $cartData);
+        })->toArray();
     }
 }
