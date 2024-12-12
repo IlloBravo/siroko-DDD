@@ -1,14 +1,8 @@
 <?php
 
-use App\Application\Cart\UseCases\AddProductToCartUseCase;
-use App\Domain\Cart\Cart;
-use App\Domain\Cart\Repository\CartRepositoryInterface;
-use App\Domain\Product\Product;
-use App\Domain\Product\Repository\ProductRepositoryInterface;
 use App\Domain\Shared\ValueObjects\UuidVO;
 use App\Infrastructure\Repositories\EloquentCartRepository;
 use App\Infrastructure\Repositories\EloquentProductRepository;
-use Ramsey\Uuid\Uuid;
 use Tests\TestCase;
 
 class CartControllerTest extends TestCase
@@ -62,6 +56,72 @@ class CartControllerTest extends TestCase
         $this->assertDatabaseHas('carts', [
             'id' => $cartId,
         ]);
+    }
+
+    /**
+     * @throws DateMalformedStringException
+     */
+    public function test_update_product_quantity_in_cart_redirect_with_success_message()
+    {
+        $productRepository = new EloquentProductRepository();
+        $products = $productRepository->findAll();
+
+        $cartRepository = new EloquentCartRepository();
+        $carts = $cartRepository->findAll();
+
+        $cartId = $carts[0]->id->__toString();
+        $productId = $products[0]->id->__toString();
+
+        $response = $this->put(route('api.cart.updateProduct', ['cartId' => $cartId]), [
+            'products' => [
+                $productId => [
+                    'quantity' => 5,
+                ],
+            ],
+        ]);
+
+        $response->assertStatus(302);
+        $response->assertRedirect(route('cart.show', ['cartId' => $cartId]));
+
+        $response->assertSessionHas('success', __('Cart.cart_updated'));
+
+        $cart = $cartRepository->findByIdOrFail(UuidVO::fromString($cartId));
+        $items = json_decode($cart->items, true);
+
+        $this->assertEquals(5, $items[0]['cartQuantity']);
+    }
+
+    /**
+     * @throws DateMalformedStringException
+     */
+    public function test_update_product_quantity_in_cart_redirect_with_error_message_due_to_insufficient_stock()
+    {
+        $productRepository = new EloquentProductRepository();
+        $products = $productRepository->findAll();
+
+        $cartRepository = new EloquentCartRepository();
+        $carts = $cartRepository->findAll();
+
+        $cartId = $carts[0]->id->__toString();
+        $productId = $products[0]->id->__toString();
+
+        $response = $this->put(route('api.cart.updateProduct', ['cartId' => $cartId]), [
+            'products' => [
+                $productId => [
+                    'quantity' => 150,
+                ],
+            ],
+        ]);
+
+        $response->assertStatus(302);
+        $response->assertRedirect(route('cart.show', ['cartId' => $cartId]));
+
+        $response->assertSessionHas('error', 'Stock insuficiente para el Producto con ID ' . $productId);
+
+        $cart = $cartRepository->findByIdOrFail(UuidVO::fromString($cartId));
+        $items = json_decode($cart->items, true);
+
+        $this->assertNotEquals($products[0]->quantity + 1, $items[0]['cartQuantity']);
     }
 
     /**

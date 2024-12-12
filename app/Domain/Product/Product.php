@@ -2,6 +2,7 @@
 
 namespace App\Domain\Product;
 
+use App\Domain\Product\Exceptions\InsufficientStockException;
 use App\Domain\Shared\ValueObjects\UuidVO;
 
 class Product
@@ -27,6 +28,10 @@ class Product
 
     public function decreaseStock(int $quantity): void
     {
+        if ($this->quantity < $quantity) {
+            throw new InsufficientStockException((string) $this->id);
+        }
+
         $this->quantity -= $quantity;
     }
 
