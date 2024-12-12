@@ -169,6 +169,6 @@ class CartController extends Controller
         return response()->json([
             'message' => __('Cart.cart_created_with_product'),
             'cartId' => $cartId
-        ])->cookie('cart_id', $cartId, 60);
+        ]);
     }
 }

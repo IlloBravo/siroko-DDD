@@ -1,8 +1,14 @@
 <?php
 
+use App\Application\Cart\UseCases\AddProductToCartUseCase;
+use App\Domain\Cart\Cart;
+use App\Domain\Cart\Repository\CartRepositoryInterface;
+use App\Domain\Product\Product;
+use App\Domain\Product\Repository\ProductRepositoryInterface;
 use App\Domain\Shared\ValueObjects\UuidVO;
 use App\Infrastructure\Repositories\EloquentCartRepository;
 use App\Infrastructure\Repositories\EloquentProductRepository;
+use Ramsey\Uuid\Uuid;
 use Tests\TestCase;
 
 class CartControllerTest extends TestCase
@@ -182,5 +188,28 @@ class CartControllerTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertViewIs('cart.thankyou');
+    }
+
+    public function test_create_cart_with_products()
+    {
+        $productRepository = new EloquentProductRepository();
+        $products = $productRepository->findAll();
+
+        $response = $this->postJson(route('api.cart.createCart'), [
+            'products' => [
+                [
+                    'id' => $products[0]->id->__toString(),
+                    'quantity' => 2,
+                ],
+            ],
+        ]);
+
+        $response->assertStatus(200);
+
+        $responseContent = json_decode($response->getContent(), true);
+
+        $this->assertDatabaseHas('carts', [
+            'id' => $responseContent['cartId'],
+        ]);
     }
 }
