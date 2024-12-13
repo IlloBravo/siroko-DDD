@@ -4,7 +4,6 @@ namespace App\Domain\Cart;
 
 use App\Domain\Product\Product;
 use App\Domain\Shared\ValueObjects\UuidVO;
-use DateMalformedStringException;
 
 final class CartItem
 {
@@ -15,9 +14,6 @@ final class CartItem
         public int $quantity
     ) {}
 
-    /**
-     * @throws DateMalformedStringException
-     */
     public static function fromDatabase(object $data): self
     {
         return new self(
@@ -30,6 +26,15 @@ final class CartItem
 
     public function setQuantity(int $newQuantity): void
     {
+        if ($newQuantity < 1) {
+            throw new \DomainException('La cantidad debe ser mayor o igual a 1.');
+        }
+
         $this->quantity = $newQuantity;
+    }
+
+    public function incrementQuantity(int $quantity): void
+    {
+        $this->setQuantity($this->quantity + $quantity);
     }
 }

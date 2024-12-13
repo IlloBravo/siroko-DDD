@@ -12,7 +12,6 @@ class Product
         public string $name,
         public float  $price,
         public int    $stock,
-        public int    $cartQuantity = 0
     ) {}
 
     public static function fromDatabase(object $data): self
@@ -22,7 +21,6 @@ class Product
             $data->name,
             $data->price,
             $data->stock,
-            $data->cartQuantity ?? 0
         );
     }
 
@@ -31,22 +29,11 @@ class Product
         if ($this->stock < $quantity) {
             throw new InsufficientStockException((string) $this->id);
         }
-        $this->cartQuantity += $quantity;
         $this->stock -= $quantity;
     }
 
     public function increaseStock(int $quantity): void
     {
         $this->stock += $quantity;
-    }
-
-    public function decreaseCartQuantity(int $quantity): void
-    {
-        $this->cartQuantity -= $quantity;
-    }
-
-    public function increaseCartQuantity(int $quantity): void
-    {
-        $this->cartQuantity += $quantity;
     }
 }

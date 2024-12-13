@@ -5,7 +5,7 @@ namespace App\Domain\Product\Exceptions;
 use Illuminate\Support\Facades\Lang;
 use RuntimeException;
 
-class InsufficientStockException extends RuntimeException
+final class InsufficientStockException extends RuntimeException
 {
     public function __construct(string $productId)
     {

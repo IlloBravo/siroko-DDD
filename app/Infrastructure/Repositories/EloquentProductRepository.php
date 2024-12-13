@@ -33,13 +33,14 @@ class EloquentProductRepository implements ProductRepositoryInterface
     public function save(Product $product): void
     {
         DB::table('products')
-            ->where('id', (string) $product->id)
-            ->update([
-                'name' => $product->name,
-                'price' => $product->price,
-                'stock' => $product->stock,
-                'cartQuantity' => $product->cartQuantity,
-            ]);
+            ->updateOrInsert(
+                ['id' => (string) $product->id],
+                [
+                    'name' => $product->name,
+                    'price' => $product->price,
+                    'stock' => $product->stock,
+                ]
+            );
     }
 
     public function increaseStock(UuidVO $productId, int $quantity): void

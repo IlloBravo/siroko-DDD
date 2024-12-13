@@ -3,6 +3,7 @@
 namespace App\Infrastructure\Repositories;
 
 use App\Domain\Cart\CartItem;
+use App\Domain\Cart\Exceptions\CartNotFoundException;
 use App\Domain\Cart\Repository\CartItemRepositoryInterface;
 use App\Domain\Product\Product;
 use App\Domain\Shared\ValueObjects\UuidVO;
@@ -12,22 +13,20 @@ class EloquentCartItemRepository implements CartItemRepositoryInterface
 {
     public function findByIdOrFail(UuidVO $id): CartItem
     {
-        $cartItemData = DB::table('cart_items')
-            ->where('id', (string) $id)
-            ->first();
+        $cartItemData = DB::table('cart_items')->where('id', (string) $id)->first();
 
         if (!$cartItemData) {
-            throw new \Exception('CartItem not found'); // Crear una excepción específica si es necesario.
+            throw new CartNotFoundException($id);
         }
 
         $productData = DB::table('products')->where('id', $cartItemData->product_id)->first();
-        $product = Product::fromDatabase($productData);
 
-        return new CartItem(
-            UuidVO::fromString($cartItemData->id),
-            $product,
-            $cartItemData->quantity
-        );
+        return CartItem::fromDatabase((object) [
+            'id' => $cartItemData->id,
+            'cart' => DB::table('carts')->where('id', $cartItemData->cart_id)->first(),
+            'product' => $productData,
+            'quantity' => $cartItemData->quantity,
+        ]);
     }
 
     public function save(CartItem $cartItem): void

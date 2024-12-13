@@ -5,7 +5,7 @@ namespace App\Domain\Cart\Exceptions;
 use RuntimeException;
 use Illuminate\Support\Facades\Lang;
 
-class CartNotFoundException extends RuntimeException
+final class CartNotFoundException extends RuntimeException
 {
     public function __construct(string $cartId)
     {
