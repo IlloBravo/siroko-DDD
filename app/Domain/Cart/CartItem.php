@@ -2,7 +2,9 @@
 
 namespace App\Domain\Cart;
 
+use App\Domain\Product\Exceptions\InsufficientStockException;
 use App\Domain\Product\Product;
+use App\Domain\Shared\Exceptions\InvalidQuantityException;
 use App\Domain\Shared\ValueObjects\UuidVO;
 
 final class CartItem
@@ -24,10 +26,23 @@ final class CartItem
         );
     }
 
+    public static function create(Cart $cart, Product $product, int $quantity): self
+    {
+        if ($quantity < 1) {
+            throw new InvalidQuantityException($quantity);
+        }
+
+        if (!$product->hasSufficientStock($quantity)) {
+            throw new InsufficientStockException($product->id);
+        }
+
+        return new self(UuidVO::generate(), $cart, $product, $quantity);
+    }
+
     public function setQuantity(int $newQuantity): void
     {
         if ($newQuantity < 1) {
-            throw new \DomainException('La cantidad debe ser mayor o igual a 1.');
+            throw new InvalidQuantityException($newQuantity);
         }
 
         $this->quantity = $newQuantity;

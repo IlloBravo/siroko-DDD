@@ -6,28 +6,45 @@ use App\Domain\Cart\Cart;
 use App\Domain\Cart\CartItem;
 use App\Domain\Cart\Exceptions\CartNotFoundException;
 use App\Domain\Cart\Repository\CartRepositoryInterface;
-use App\Domain\Product\Product;
 use App\Domain\Shared\ValueObjects\UuidVO;
-use DateMalformedStringException;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 class EloquentCartRepository implements CartRepositoryInterface
 {
-    /**
-     * @throws DateMalformedStringException
-     */
     public function findByIdOrFail(UuidVO $id): Cart
     {
-        $uuid = UuidVO::fromString($id);
-
-        $cartData = DB::table('carts')->where('id', $uuid)->first();
+        $cartData = DB::table('carts')
+            ->where('id', (string) $id)
+            ->first();
 
         if (!$cartData) {
             throw new CartNotFoundException($id);
         }
 
-        return Cart::fromDatabase($cartData);
+        $cartItemsData = json_decode($cartData->items ?? '[]', true);
+
+        $cartItems = array_map(function ($item) {
+            $productData = DB::table('products')->where('id', $item['product']['id'])->first();
+
+            return CartItem::fromDatabase((object) [
+                'id' => $item['id'],
+                'cart' => null,
+                'product' => $productData,
+                'quantity' => $item['quantity'],
+            ]);
+        }, $cartItemsData);
+
+        $cart = Cart::fromDatabase((object) [
+            'id' => $cartData->id,
+            'items' => json_encode($cartItems),
+        ]);
+
+        foreach ($cart->getCartItems() as $cartItem) {
+            $cartItem->cart = $cart;
+        }
+
+        return $cart;
     }
 
     public function findAll(): Collection

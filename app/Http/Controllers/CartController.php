@@ -32,27 +32,30 @@ class CartController extends Controller
     ) {}
 
     /**
-     * @throws ProductNotFoundException
+     * Añadir productos al carrito
+     *
      * @throws CartNotFoundException
+     * @throws ProductNotFoundException
+     * @throws InsufficientStockException
      */
     public function addProduct(Request $request, string $cartId): JsonResponse
     {
-        $cart = $this->cartRepository->findByIdOrFail(UuidVO::fromString($cartId));
+        $validatedData = $request->validate([
+            'products' => 'required|array|min:1',
+            'products.*.id' => 'required|uuid',
+            'products.*.quantity' => 'required|integer|min:1',
+        ]);
 
-        $products = $request->get('products');
-
-        foreach ($products as $product) {
-            if ($product['quantity'] > 0) {
-                $this->addProductToCartUseCase->execute(
-                    $cart,
-                    $this->productRepository->findByIdOrFail(UuidVO::fromString($product['id'])),
-                    $product['quantity']
-                );
-            }
+        foreach ($validatedData['products'] as $product) {
+            $this->addProductToCartUseCase->execute(
+                $cartId,
+                $product['id'],
+                $product['quantity']
+            );
         }
 
         return response()->json([
-            'message' => __('Cart.products_added')
+            'message' => __('Cart.products_added'),
         ]);
     }
 

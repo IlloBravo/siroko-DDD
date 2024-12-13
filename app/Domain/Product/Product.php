@@ -24,6 +24,11 @@ class Product
         );
     }
 
+    public function hasSufficientStock(int $quantity): bool
+    {
+        return $this->stock >= $quantity;
+    }
+
     public function decreaseStock(int $quantity): void
     {
         if ($this->stock < $quantity) {
