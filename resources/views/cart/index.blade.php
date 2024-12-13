@@ -19,8 +19,8 @@
                     <ul>
                         @foreach ($cart->cartItems as $cartItem)
                             <li>
-                                <strong>{{ $cartItem->product->name }}</strong> -
-                                {{ __('Cart.price') }}: {{ $cartItem->product->price }} € -
+                                <strong>{{ $cartItem->product()->name }}</strong> -
+                                {{ __('Cart.price') }}: {{ $cartItem->product()->price }} € -
                                 {{ __('Cart.quantity') }}: {{ $cartItem->quantity }}
                             </li>
                         @endforeach

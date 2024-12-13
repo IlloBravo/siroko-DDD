@@ -25,6 +25,11 @@ readonly class AddProductToCartUseCase
     public function execute(string $cartId, string $productId, int $quantity): void
     {
         $product = $this->productRepository->findByIdOrFail(UuidVO::fromString($productId));
+
+        if (!$product->hasSufficientStock($quantity)) {
+            throw new InsufficientStockException($productId);
+        }
+
         $cart = $this->cartRepository->findByIdOrFail(UuidVO::fromString($cartId));
 
         $cartItem = $this->cartItemRepository->create(
@@ -32,6 +37,8 @@ readonly class AddProductToCartUseCase
             $product->id,
             $quantity
         );
+
+        $this->cartItemRepository->save($cartItem);
 
         $cart->addProduct($cartItem);
         $this->cartRepository->save($cart);

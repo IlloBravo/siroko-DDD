@@ -16,11 +16,24 @@ final class Cart
 
     public static function fromDatabase(object $data): self
     {
-        $cartItemIds = json_decode($data->items, true);
+        $cartItems = collect(json_decode($data->items, true))->map(function ($item) {
+            return new CartItem(
+                UuidVO::fromString($item['id']),
+                UuidVO::fromString($item['cartId']),
+                UuidVO::fromString($item['productId']),
+                $item['quantity']
+            );
+        });
+
         return new self(
             UuidVO::fromString($data->id),
-            collect($cartItemIds)
+            $cartItems
         );
+    }
+
+    public function getItems(): Collection
+    {
+        return $this->cartItems;
     }
 
     public function addProduct(CartItem $newCartItem): void

@@ -34,29 +34,18 @@ class EloquentCartRepository implements CartRepositoryInterface
 
     public function save(Cart $cart): void
     {
-        /*$product = DB::table('products')->where(
-            'id', (string) $cart->cartItems->first()->productId
-        )->first();
+        $cartItemsData = $cart->getCartItems()->map(function (CartItem $item) {
+            return [
+                'id' => (string) $item->id,
+                'cartId' => (string) $item->cartId,
+                'productId' => (string) $item->productId,
+                'quantity' => $item->quantity,
+            ];
+        })->toArray();
 
         DB::table('carts')->updateOrInsert(
             ['id' => (string) $cart->id],
-            [
-                'items' => json_encode(
-                    $cart->cartItems->map(fn(CartItem $item) => [
-                        'id' => (string) $item->id,
-                        'product' => [
-                            'id' => (string) $product->id,
-                            'name' => $product->name,
-                            'price' => $product->price,
-                        ],
-                        'quantity' => $item->quantity,
-                    ])->toArray()
-                ),
-            ]
-        );*/
-        DB::table('carts')->updateOrInsert(
-            ['id' => (string) $cart->id],
-            ['items' => json_encode($cart->cartItems->toArray())]
+            ['items' => json_encode($cartItemsData)]
         );
     }
 
