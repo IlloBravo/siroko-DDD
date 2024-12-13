@@ -58,4 +58,19 @@ class EloquentProductRepository implements ProductRepositoryInterface
                 'stock' => $productData->stock + $quantity,
             ]);
     }
+
+    public function decreaseStock(UuidVO $productId, int $quantity): void
+    {
+        $productData = DB::table('products')->where('id', (string) $productId)->first();
+
+        if (!$productData) {
+            throw new ProductNotFoundException((string) $productId);
+        }
+
+        DB::table('products')
+            ->where('id', (string) $productId)
+            ->update([
+                'stock' => $productData->stock - $quantity,
+            ]);
+    }
 }
