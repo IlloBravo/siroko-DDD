@@ -5,7 +5,6 @@ namespace App\Domain\Cart;
 use App\Domain\Product\Exceptions\InsufficientStockException;
 use App\Domain\Product\Product;
 use App\Domain\Shared\ValueObjects\UuidVO;
-use DateTime;
 use Illuminate\Support\Collection;
 
 final class Cart

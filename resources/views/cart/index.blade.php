@@ -7,8 +7,6 @@
         <thead>
         <tr>
             <th>{{ __('Cart.cart_id') }}</th>
-            <th>{{ __('Cart.created_at') }}</th>
-            <th>{{ __('Cart.updated_at') }}</th>
             <th>{{ __('Cart.products') }}</th>
             <th>{{ __('Cart.actions') }}</th>
         </tr>
@@ -17,11 +15,9 @@
         @foreach ($carts as $cart)
             <tr>
                 <td>{{ $cart->id }}</td>
-                <td>{{ $cart->createdAt->format('Y-m-d H:i') }}</td>
-                <td>{{ $cart->updatedAt->format('Y-m-d H:i') }}</td>
                 <td>
                     <ul>
-                        @foreach ($cart->products as $product)
+                        @foreach ($cart->cartItems as $product)
                             <li>
                                 <strong>{{ $product->name }}</strong> - {{ __('Cart.price') }}: {{ $product->price }} € - {{ __('Cart.quantity') }}: {{ $product->cartQuantity }}
                             </li>
