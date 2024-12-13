@@ -38,12 +38,11 @@ readonly class AddProductToCartUseCase
             $quantity
         );
 
-        $this->cartItemRepository->save($cartItem);
-
-        $cart->addProduct($cartItem);
-        $this->cartRepository->save($cart);
-
+        $this->cartItemRepository->save($cartItem);;
         $this->productRepository->decreaseStock($product->id, $quantity);
         $this->productRepository->save($product);
+
+        $cart->addProduct($cartItem, $this->cartItemRepository);
+        $this->cartRepository->save($cart);
     }
 }
