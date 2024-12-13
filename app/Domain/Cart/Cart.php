@@ -11,7 +11,6 @@ final class Cart
 {
     public function __construct(
         public UuidVO     $id,
-        /** @var Collection<int, CartItem> */
         public Collection $cartItems
     ) {}
 
@@ -28,7 +27,7 @@ final class Cart
     public function addProduct(CartItem $newCartItem): void
     {
         $existingCartItem = $this->cartItems
-            ->first(fn(CartItem $item) => $item->product->id->equals($newCartItem->product->id));
+            ->first(fn(CartItem $item) => $item->productId->equals($newCartItem->productId));
 
         if ($existingCartItem) {
             $existingCartItem->incrementQuantity($newCartItem->quantity);
@@ -40,7 +39,7 @@ final class Cart
     public function updateProductQuantity(UuidVO $productId, int $newQuantity): void
     {
         $cartItem = $this->cartItems
-            ->first(fn(CartItem $item) => $item->product->id->equals($productId));
+            ->first(fn(CartItem $item) => $item->productId->equals($productId));
 
         if (!$cartItem) {
             throw new CartNotFoundException($this->id);
@@ -56,7 +55,7 @@ final class Cart
     public function removeProduct(UuidVO $productId): void
     {
         $this->cartItems = $this->cartItems
-            ->reject(fn(CartItem $item) => $item->product->id->equals($productId));
+            ->reject(fn(CartItem $item) => $item->productId->equals($productId));
     }
 
     public function checkout(): void

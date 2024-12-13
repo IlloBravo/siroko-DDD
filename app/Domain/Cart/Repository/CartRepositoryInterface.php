@@ -29,13 +29,6 @@ interface CartRepositoryInterface
     public function save(Cart $cart): void;
 
     /**
-     * Update an existing cart.
-     *
-     * @param Cart $cart
-     */
-    public function update(Cart $cart): void;
-
-    /**
      * Delete a cart by its ID.
      *
      * @param UuidVO $id

@@ -11,8 +11,8 @@ final class CartItem
 {
     public function __construct(
         public UuidVO $id,
-        public Cart $cart,
-        public Product $product,
+        public UuidVO $cartId,
+        public UuidVO $productId,
         public int $quantity
     ) {}
 
@@ -20,8 +20,8 @@ final class CartItem
     {
         return new self(
             UuidVO::fromString($data->id),
-            Cart::fromDatabase((object) $data->cart),
-            Product::fromDatabase((object) $data->product),
+            UuidVO::fromString($data->cart->id),
+            UuidVO::fromString($data->product->id),
             $data->quantity
         );
     }
@@ -36,7 +36,7 @@ final class CartItem
             throw new InsufficientStockException($product->id);
         }
 
-        return new self(UuidVO::generate(), $cart, $product, $quantity);
+        return new self(UuidVO::generate(), $cart->id, $product->id, $quantity);
     }
 
     public function setQuantity(int $newQuantity): void

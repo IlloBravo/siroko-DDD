@@ -27,8 +27,8 @@ class EloquentCartItemRepository implements CartItemRepositoryInterface
         DB::table('cart_items')->updateOrInsert(
             ['id' => (string) $cartItem->id],
             [
-                'cart_id' => (string) $cartItem->cart->id,
-                'product_id' => (string) $cartItem->product->id,
+                'cart_id' => (string) $cartItem->cartId,
+                'product_id' => (string) $cartItem->productId,
                 'quantity' => $cartItem->quantity,
             ]
         );

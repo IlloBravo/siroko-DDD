@@ -28,13 +28,12 @@ readonly class AddProductToCartUseCase
         $product = $this->productRepository->findByIdOrFail(UuidVO::fromString($productId));
 
         $cartItem = CartItem::create($cart, $product, $quantity);
+        $this->cartItemRepository->save($cartItem);
 
         $cart->addProduct($cartItem);
 
         $product->decreaseStock($quantity);
-        $cartItem->cart = $cart;
 
-        $this->cartItemRepository->save($cartItem);
         $this->cartRepository->save($cart);
         $this->productRepository->save($product);
     }
