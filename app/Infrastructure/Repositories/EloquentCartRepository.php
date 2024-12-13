@@ -34,7 +34,7 @@ class EloquentCartRepository implements CartRepositoryInterface
 
     public function save(Cart $cart): void
     {
-        $product = DB::table('products')->where(
+        /*$product = DB::table('products')->where(
             'id', (string) $cart->cartItems->first()->productId
         )->first();
 
@@ -53,6 +53,10 @@ class EloquentCartRepository implements CartRepositoryInterface
                     ])->toArray()
                 ),
             ]
+        );*/
+        DB::table('carts')->updateOrInsert(
+            ['id' => (string) $cart->id],
+            ['items' => json_encode($cart->cartItems->toArray())] // Guardamos los IDs de cart_items
         );
     }
 

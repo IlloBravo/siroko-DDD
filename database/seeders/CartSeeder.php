@@ -15,7 +15,7 @@ class CartSeeder extends Seeder
     {
         $cart = [
             'id' => UuidVO::generate(),
-            'items' => collect(),
+            'items' => json_encode([]),
         ];
 
         DB::table('carts')->insert($cart);

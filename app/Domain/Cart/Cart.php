@@ -16,11 +16,10 @@ final class Cart
 
     public static function fromDatabase(object $data): self
     {
+        $cartItemIds = json_decode($data->items, true);
         return new self(
             UuidVO::fromString($data->id),
-            collect(json_decode($data->items, true))->map(
-                fn($item) => CartItem::fromDatabase((object) $item)
-            )
+            collect($cartItemIds)
         );
     }
 
