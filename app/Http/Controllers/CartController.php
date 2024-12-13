@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Application\Cart\UseCases\AddProductToCartUseCase;
-use App\Application\Cart\UseCases\UpdateProductQuantityUseCase;
+use App\Application\Cart\UseCases\UpdateCartItemQuantityUseCase;
 use App\Application\Cart\UseCases\RemoveProductFromCartUseCase;
 use App\Application\Cart\UseCases\GetTotalProductsUseCase;
 use App\Application\Cart\UseCases\CheckoutCartUseCase;
@@ -11,7 +11,6 @@ use App\Domain\Cart\Exceptions\CartNotFoundException;
 use App\Domain\Cart\Repository\CartRepositoryInterface;
 use App\Domain\Product\Exceptions\InsufficientStockException;
 use App\Domain\Product\Exceptions\ProductNotFoundException;
-use App\Domain\Product\Repository\ProductRepositoryInterface;
 use App\Domain\Shared\ValueObjects\UuidVO;
 use Exception;
 use Illuminate\Http\RedirectResponse;
@@ -22,12 +21,12 @@ use Illuminate\View\View;
 class CartController extends Controller
 {
     public function __construct(
-        private readonly AddProductToCartUseCase      $addProductToCartUseCase,
-        private readonly UpdateProductQuantityUseCase $updateProductQuantityUseCase,
-        private readonly RemoveProductFromCartUseCase $removeProductFromCartUseCase,
-        private readonly GetTotalProductsUseCase      $getTotalProductsUseCase,
-        private readonly CheckoutCartUseCase          $checkoutCartUseCase,
-        private readonly CartRepositoryInterface      $cartRepository
+        private readonly AddProductToCartUseCase       $addProductToCartUseCase,
+        private readonly UpdateCartItemQuantityUseCase $updateProductQuantityUseCase,
+        private readonly RemoveProductFromCartUseCase  $removeProductFromCartUseCase,
+        private readonly GetTotalProductsUseCase       $getTotalProductsUseCase,
+        private readonly CheckoutCartUseCase           $checkoutCartUseCase,
+        private readonly CartRepositoryInterface       $cartRepository
     ) {}
 
     /**

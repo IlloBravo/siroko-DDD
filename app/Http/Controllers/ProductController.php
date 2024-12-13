@@ -19,8 +19,6 @@ class ProductController extends Controller
 
         $cart = $this->cartRepository->findAll()->first();
 
-        dump($products, $cart);
-
         return view('product.index', compact('products', 'cart'));
     }
 }

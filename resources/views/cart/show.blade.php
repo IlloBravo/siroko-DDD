@@ -22,7 +22,7 @@
                 <tr>
                     <td>{{ $cartItem->product()->name }}</td>
                     <td>
-                        <input type="number" name="products[{{ $cartItem->id }}][quantity]" value="{{ $cartItem->quantity }}" min="1" class="form-control w-50">
+                        <input type="number" name="products[{{ $cartItem->product()->id }}][quantity]" value="{{ $cartItem->quantity }}" min="1" class="form-control w-50">
                     </td>
                     <td>
                         <button type="button" class="btn btn-danger btn-sm delete-button" data-delete-url="{{ route('api.cart.removeProduct', ['cartId' => $cart->id, 'productId' => $cartItem->product()->id]) }}">

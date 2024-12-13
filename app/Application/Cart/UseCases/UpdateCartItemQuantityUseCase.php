@@ -3,16 +3,17 @@
 namespace App\Application\Cart\UseCases;
 
 use App\Domain\Cart\Exceptions\CartNotFoundException;
+use App\Domain\Cart\Repository\CartItemRepositoryInterface;
 use App\Domain\Cart\Repository\CartRepositoryInterface;
 use App\Domain\Product\Exceptions\InsufficientStockException;
-use App\Domain\Product\Repository\ProductRepositoryInterface;
+use App\Domain\Shared\Exceptions\InvalidQuantityException;
 use App\Domain\Shared\ValueObjects\UuidVO;
 
-readonly class UpdateProductQuantityUseCase
+readonly class UpdateCartItemQuantityUseCase
 {
     public function __construct(
         private CartRepositoryInterface $cartRepository,
-        private ProductRepositoryInterface $productRepository
+        private CartItemRepositoryInterface $cartItemRepository
     ) {}
 
     /**
@@ -21,12 +22,18 @@ readonly class UpdateProductQuantityUseCase
      */
     public function execute(string $cartId, string $productId, int $newQuantity): void
     {
-        $uuidProduct = UuidVO::fromString($productId);
+        if ($newQuantity <= 0) {
+            throw new InvalidQuantityException($newQuantity);
+        }
+
         $cart = $this->cartRepository->findByIdOrFail(UuidVO::fromString($cartId));
 
-        $cart->updateProductQuantity($uuidProduct, $newQuantity);
+        $cart->updateProductQuantity(
+            UuidVO::fromString($productId),
+            $newQuantity,
+            $this->cartItemRepository
+        );
 
         $this->cartRepository->save($cart);
-        $this->productRepository->save($cart->getProduct($uuidProduct));
     }
 }

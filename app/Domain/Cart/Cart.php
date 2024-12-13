@@ -6,6 +6,7 @@ use App\Domain\Cart\Exceptions\CartNotFoundException;
 use App\Domain\Shared\Exceptions\InvalidQuantityException;
 use App\Domain\Shared\ValueObjects\UuidVO;
 use Illuminate\Support\Collection;
+use App\Domain\Cart\Repository\CartItemRepositoryInterface;
 
 final class Cart
 {
@@ -48,7 +49,7 @@ final class Cart
         }
     }
 
-    public function updateProductQuantity(UuidVO $productId, int $newQuantity): void
+    public function updateProductQuantity(UuidVO $productId, int $newQuantity, CartItemRepositoryInterface $cartItemRepository): void
     {
         $cartItem = $this->cartItems
             ->first(fn(CartItem $item) => $item->productId->equals($productId));
@@ -61,7 +62,9 @@ final class Cart
             throw new InvalidQuantityException($newQuantity);
         }
 
-        $cartItem->setQuantity($newQuantity);
+        $cartItemRepository->updateQuantity($cartItem->id, $newQuantity);
+
+        $cartItem->quantity = $newQuantity;
     }
 
     public function removeProduct(UuidVO $productId): void
