@@ -17,9 +17,11 @@
                 <td>{{ $cart->id }}</td>
                 <td>
                     <ul>
-                        @foreach ($cart->cartItems as $product)
+                        @foreach ($cart->cartItems as $cartItem)
                             <li>
-                                <strong>{{ $product->name }}</strong> - {{ __('Cart.price') }}: {{ $product->price }} € - {{ __('Cart.quantity') }}: {{ $product->cartQuantity }}
+                                <strong>{{ $cartItem->product->name }}</strong> -
+                                {{ __('Cart.price') }}: {{ $cartItem->product->price }} € -
+                                {{ __('Cart.quantity') }}: {{ $cartItem->quantity }}
                             </li>
                         @endforeach
                     </ul>

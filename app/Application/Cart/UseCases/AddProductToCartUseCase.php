@@ -2,11 +2,11 @@
 
 namespace App\Application\Cart\UseCases;
 
-use App\Domain\Cart\CartItem;
 use App\Domain\Cart\Exceptions\CartNotFoundException;
 use App\Domain\Cart\Repository\CartItemRepositoryInterface;
 use App\Domain\Cart\Repository\CartRepositoryInterface;
 use App\Domain\Product\Exceptions\InsufficientStockException;
+use App\Domain\Product\Exceptions\ProductNotFoundException;
 use App\Domain\Product\Repository\ProductRepositoryInterface;
 use App\Domain\Shared\ValueObjects\UuidVO;
 
@@ -24,16 +24,19 @@ readonly class AddProductToCartUseCase
      */
     public function execute(string $cartId, string $productId, int $quantity): void
     {
-        $cart = $this->cartRepository->findByIdOrFail(UuidVO::fromString($cartId));
         $product = $this->productRepository->findByIdOrFail(UuidVO::fromString($productId));
+        $cart = $this->cartRepository->findByIdOrFail(UuidVO::fromString($cartId));
 
-        $cartItem = CartItem::create($cart, $product, $quantity);
-        $this->cartItemRepository->save($cartItem);
+        $cartItem = $this->cartItemRepository->create(
+            $cart->id,
+            $product->id,
+            $quantity
+        );
 
         $cart->addProduct($cartItem);
         $this->cartRepository->save($cart);
 
-        $product->decreaseStock($quantity);
+        $this->productRepository->decreaseStock($product->id, $quantity);
         $this->productRepository->save($product);
     }
 }

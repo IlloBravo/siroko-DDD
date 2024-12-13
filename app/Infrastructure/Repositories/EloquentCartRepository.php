@@ -56,7 +56,7 @@ class EloquentCartRepository implements CartRepositoryInterface
         );*/
         DB::table('carts')->updateOrInsert(
             ['id' => (string) $cart->id],
-            ['items' => json_encode($cart->cartItems->toArray())] // Guardamos los IDs de cart_items
+            ['items' => json_encode($cart->cartItems->toArray())]
         );
     }
 
