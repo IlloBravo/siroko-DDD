@@ -27,7 +27,6 @@ class CartController extends Controller
         private readonly RemoveProductFromCartUseCase $removeProductFromCartUseCase,
         private readonly GetTotalProductsUseCase      $getTotalProductsUseCase,
         private readonly CheckoutCartUseCase          $checkoutCartUseCase,
-        private readonly ProductRepositoryInterface   $productRepository,
         private readonly CartRepositoryInterface      $cartRepository
     ) {}
 

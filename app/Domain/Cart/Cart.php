@@ -31,7 +31,7 @@ final class Cart
             ->first(fn(CartItem $item) => $item->product->id->equals($newCartItem->product->id));
 
         if ($existingCartItem) {
-            $existingCartItem->setQuantity($existingCartItem->quantity + $newCartItem->quantity);
+            $existingCartItem->incrementQuantity($newCartItem->quantity);
         } else {
             $this->cartItems->push($newCartItem);
         }

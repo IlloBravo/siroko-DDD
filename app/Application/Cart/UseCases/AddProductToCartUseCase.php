@@ -4,6 +4,7 @@ namespace App\Application\Cart\UseCases;
 
 use App\Domain\Cart\CartItem;
 use App\Domain\Cart\Exceptions\CartNotFoundException;
+use App\Domain\Cart\Repository\CartItemRepositoryInterface;
 use App\Domain\Cart\Repository\CartRepositoryInterface;
 use App\Domain\Product\Exceptions\InsufficientStockException;
 use App\Domain\Product\Repository\ProductRepositoryInterface;
@@ -13,7 +14,8 @@ readonly class AddProductToCartUseCase
 {
     public function __construct(
         private CartRepositoryInterface $cartRepository,
-        private ProductRepositoryInterface $productRepository
+        private ProductRepositoryInterface $productRepository,
+        private CartItemRepositoryInterface $cartItemRepository
     ) {}
 
     /**
@@ -25,19 +27,14 @@ readonly class AddProductToCartUseCase
         $cart = $this->cartRepository->findByIdOrFail(UuidVO::fromString($cartId));
         $product = $this->productRepository->findByIdOrFail(UuidVO::fromString($productId));
 
-        $existingCartItem = $cart->getCartItems()->first(
-            fn($item) => $item->product->id->equals($product->id)
-        );
+        $cartItem = CartItem::create($cart, $product, $quantity);
 
-        if ($existingCartItem) {
-            $existingCartItem->incrementQuantity($quantity);
-        } else {
-            $cartItem = CartItem::create($cart, $product, $quantity);
-            $cart->addProduct($cartItem);
-        }
+        $cart->addProduct($cartItem);
 
         $product->decreaseStock($quantity);
+        $cartItem->cart = $cart;
 
+        $this->cartItemRepository->save($cartItem);
         $this->cartRepository->save($cart);
         $this->productRepository->save($product);
     }

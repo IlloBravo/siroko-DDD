@@ -13,7 +13,32 @@ interface CartRepositoryInterface
      * @throws CartNotFoundException
      */
     public function findByIdOrFail(UuidVO $id): Cart;
+
+    /**
+     * Retrieve all carts.
+     *
+     * @return Collection<int, Cart>
+     */
     public function findAll(): Collection;
+
+    /**
+     * Save a cart (insert or update its data and relationships).
+     *
+     * @param Cart $cart
+     */
     public function save(Cart $cart): void;
+
+    /**
+     * Update an existing cart.
+     *
+     * @param Cart $cart
+     */
+    public function update(Cart $cart): void;
+
+    /**
+     * Delete a cart by its ID.
+     *
+     * @param UuidVO $id
+     */
     public function delete(UuidVO $id): void;
 }

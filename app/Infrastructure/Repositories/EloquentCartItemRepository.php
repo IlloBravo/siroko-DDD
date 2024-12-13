@@ -19,14 +19,7 @@ class EloquentCartItemRepository implements CartItemRepositoryInterface
             throw new CartNotFoundException($id);
         }
 
-        $productData = DB::table('products')->where('id', $cartItemData->product_id)->first();
-
-        return CartItem::fromDatabase((object) [
-            'id' => $cartItemData->id,
-            'cart' => DB::table('carts')->where('id', $cartItemData->cart_id)->first(),
-            'product' => $productData,
-            'quantity' => $cartItemData->quantity,
-        ]);
+        return CartItem::fromDatabase($cartItemData);
     }
 
     public function save(CartItem $cartItem): void
