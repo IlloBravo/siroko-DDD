@@ -17,8 +17,6 @@ class CartSeeder extends Seeder
         $cart = [
             'id' => (string) Uuid::uuid4(),
             'items' => collect(),
-            'created_at' => new DateTime(),
-            'updated_at' => new DateTime(),
         ];
 
         DB::table('carts')->insert($cart);

@@ -5,7 +5,6 @@ namespace App\Domain\Cart;
 use App\Domain\Product\Exceptions\InsufficientStockException;
 use App\Domain\Product\Product;
 use App\Domain\Shared\ValueObjects\UuidVO;
-use DateMalformedStringException;
 use DateTime;
 use Illuminate\Support\Collection;
 
@@ -13,23 +12,16 @@ final class Cart
 {
     public function __construct(
         public UuidVO     $id,
-        public Collection $products,
-        public DateTime   $createdAt,
-        public DateTime   $updatedAt
+        public Collection $cartItems
     ) {}
 
-    /**
-     * @throws DateMalformedStringException
-     */
     public static function fromDatabase(object $data): self
     {
         return new self(
             UuidVO::fromString($data->id),
             collect(json_decode($data->items, true))->map(
-                fn($item) => Product::fromDatabase((object) $item)
-            ),
-            new DateTime($data->created_at),
-            new DateTime($data->updated_at)
+                fn($item) => CartItem::fromDatabase((object) $item)
+            )
         );
     }
 
@@ -49,8 +41,6 @@ final class Cart
         }
 
         $product->stock -= $quantity;
-
-        $this->updatedAt = new DateTime();
     }
 
 
@@ -70,7 +60,6 @@ final class Cart
             }
         });
 
-        $this->updatedAt = new DateTime();
     }
 
     public function removeProduct(UuidVO $productId): void
@@ -82,7 +71,6 @@ final class Cart
             }
         });
 
-        $this->updatedAt = new DateTime();
     }
 
     public function getTotalProducts(): int
@@ -93,7 +81,6 @@ final class Cart
     public function checkout(): void
     {
         $this->products = collect();
-        $this->updatedAt = new DateTime();
     }
 
     public function getProductStock(UuidVO $productId): int

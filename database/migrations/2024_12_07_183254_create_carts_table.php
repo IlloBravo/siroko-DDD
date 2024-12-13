@@ -14,7 +14,6 @@ return new class extends Migration
         Schema::create('carts', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->json('items');
-            $table->timestamps();
         });
     }
 

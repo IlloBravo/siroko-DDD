@@ -19,35 +19,30 @@ class ProductSeeder extends Seeder
                 'name' => 'Gafas de Sol Deportivas',
                 'price' => 59.99,
                 'stock' => 10,
-                'cartQuantity' => 0,
             ],
             [
                 'id' => UuidVO::generate(),
                 'name' => 'Chaqueta Deportiva',
                 'price' => 129.99,
                 'stock' => 5,
-                'cartQuantity' => 0,
             ],
             [
                 'id' => UuidVO::generate(),
                 'name' => 'Zapatillas de Running',
                 'price' => 89.99,
                 'stock' => 15,
-                'cartQuantity' => 0,
             ],
             [
                 'id' => UuidVO::generate(),
                 'name' => 'Camiseta Técnica',
                 'price' => 29.99,
                 'stock' => 20,
-                'cartQuantity' => 0,
             ],
             [
                 'id' => UuidVO::generate(),
                 'name' => 'Pantalones Cortos Deportivos',
                 'price' => 39.99,
                 'stock' => 12,
-                'cartQuantity' => 0,
             ],
         ];
 
