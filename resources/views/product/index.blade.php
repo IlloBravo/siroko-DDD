@@ -43,8 +43,7 @@
         <button type="submit" class="btn btn-primary mt-3">{{ __('Cart.add_to_cart') }}</button>
     </form>
 
-    <!-- Botón para ver carrito (aparece tras éxito) -->
-    <div id="cart-button-container" class="mt-4" style="display: none;">
+    <div id="cart-button-container" class="mt-4">
         <a id="view-cart-button" href="{{ route('cart.show', ['cartId' => $cart->id]) }}" class="btn btn-success">{{ __('Cart.view_cart') }}</a>
     </div>
 @endsection
@@ -52,19 +51,17 @@
 @section('scripts')
     <script>
         $(document).ready(function () {
-            // Manejo del evento `submit` del formulario
             $('#add-to-cart-form').on('submit', function (e) {
-                e.preventDefault(); // Evitamos que el formulario se envíe de forma tradicional
+                e.preventDefault();
 
-                const cartId = $(this).data('cart-id'); // ID del carrito
-                const formData = $(this).serializeArray(); // Datos del formulario
+                const cartId = $(this).data('cart-id');
+                const formData = $(this).serializeArray();
 
                 const payload = {
                     cart_id: cartId,
                     products: []
                 };
 
-                // Filtrar productos que NO tienen cantidad > 0
                 let currentProduct = {};
                 formData.forEach((field) => {
                     if (field.name.includes('[id]')) {
@@ -77,44 +74,40 @@
                     }
                 });
 
-                // Validar si no se seleccionaron productos antes de enviar
                 if (payload.products.length === 0) {
                     $('#alert-container').html('<div class="alert alert-warning">{{ __('Cart.no_products_selected') }}</div>');
+                    setTimeout(() => {
+                        $('#alert-container').fadeOut('slow');
+                    }, 3000);
                     return;
                 }
 
-                // Enviar la solicitud AJAX
                 $.ajax({
-                    url: '{{ route('api.cart.addCartItem', ['cartId' => ':cartId']) }}'.replace(':cartId', cartId), // URL dinámica para el carrito
+                    url: '{{ route('api.cart.addCartItem', ['cartId' => ':cartId']) }}'.replace(':cartId', cartId),
                     method: 'POST',
                     data: JSON.stringify(payload),
                     contentType: 'application/json',
                     success: function (response) {
-                        // Mostrar mensaje de éxito
                         $('#alert-container').html('<div class="alert alert-success">' + response.message + '</div>');
 
-                        // Actualizar stock visualmente tras éxito
                         payload.products.forEach((product) => {
                             const stockCell = $('#stock-' + product.id);
                             const currentStock = parseInt(stockCell.text(), 10);
                             stockCell.text(currentStock - product.quantity);
                         });
 
-                        // Mostrar botón de ver carrito
-                        $('#cart-button-container').show();
+                        setTimeout(() => {
+                            $('#alert-container').fadeOut('slow', function () {
+                                location.reload();
+                            });
+                        }, 3000);
                     },
                     error: function (xhr) {
-                        // Manejar errores específicos y mostrarlos
-                        if (xhr.responseJSON && xhr.responseJSON.errors) {
-                            let errorsHtml = '<div class="alert alert-danger"><ul>';
-                            Object.entries(xhr.responseJSON.errors).forEach(([key, error]) => {
-                                errorsHtml += '<li>' + error + '</li>';
-                            });
-                            errorsHtml += '</ul></div>';
-                            $('#alert-container').html(errorsHtml);
-                        } else {
-                            $('#alert-container').html('<div class="alert alert-danger">{{ __('Cart.add_product_error') }}</div>');
-                        }
+                        $('#alert-container').html('<div class="alert alert-danger">' + xhr.responseJSON.error + '</div>');
+
+                        setTimeout(() => {
+                            $('#alert-container').fadeOut('slow');
+                        }, 3000);
                     }
                 });
             });

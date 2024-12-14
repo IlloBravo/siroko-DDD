@@ -38,17 +38,19 @@ class CartController extends Controller
             'products.*.quantity' => 'required|integer|min:1',
         ]);
 
-        foreach ($validatedData['products'] as $product) {
-            $this->addProductToCartUseCase->execute(
-                $cartId,
-                $product['id'],
-                $product['quantity']
-            );
-        }
+        try {
+            foreach ($validatedData['products'] as $product) {
+                $this->addProductToCartUseCase->execute(
+                    $cartId,
+                    $product['id'],
+                    $product['quantity']
+                );
+            }
 
-        return response()->json([
-            'message' => __('Cart.products_added'),
-        ]);
+            return response()->json(['message' => __('Cart.products_added')]);
+        } catch (CartNotFoundException|ProductNotFoundException|InsufficientStockException $e) {
+            return response()->json(['error' => $e->getMessage()], 404);
+        }
     }
 
     public function updateCart(Request $request, string $cartId): JsonResponse|RedirectResponse
