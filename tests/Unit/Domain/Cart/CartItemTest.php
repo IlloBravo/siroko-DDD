@@ -36,10 +36,11 @@ class CartItemTest extends TestCase
             'stock' => 10,
         ];
 
+        // Cambiar cart -> cart_id y product -> product_id
         $cartItemData = (object) [
             'id' => UuidVO::generate()->__toString(),
-            'cart' => $cartData,
-            'product' => $productData,
+            'cart_id' => $cartData->id,          // Usa el ID del carrito
+            'product_id' => $productData->id,    // Usa el ID del producto
             'quantity' => 3,
         ];
 

@@ -18,24 +18,21 @@ final class CartItem
 
     public static function fromDatabase(object $data): self
     {
-        $product = Product::fromDatabase($data->product);
-        $cart = Cart::fromDatabase($data->cart);
-
         return new self(
             UuidVO::fromString($data->id),
-            $cart->id,
-            $product->id,
+            UuidVO::fromString($data->cart_id),
+            UuidVO::fromString($data->product_id),
             $data->quantity
         );
     }
 
     public function product(): Product
     {
-        return resolve(ProductRepositoryInterface::class)->findByIdOrFail($this->productId);
+        return app(ProductRepositoryInterface::class)->findByIdOrFail($this->productId);
     }
 
     public function cart(): Cart
     {
-        return resolve(CartRepositoryInterface::class)->findByIdOrFail($this->cartId);
+        return app(CartRepositoryInterface::class)->findByIdOrFail($this->cartId);
     }
 }

@@ -40,15 +40,15 @@ class CartTest extends TestCase
 
         $cartItemData1 = (object) [
             'id' => UuidVO::generate()->__toString(),
-            'cart' => $cartData,
-            'product' => $productData,
+            'cart_id' => $cartData->id,
+            'product_id' => $productData->id,
             'quantity' => 2,
         ];
 
         $cartItemData2 = (object) [
             'id' => UuidVO::generate()->__toString(),
-            'cart' => $cartData,
-            'product' => $productData,
+            'cart_id' => $cartData->id,
+            'product_id' => $productData->id,
             'quantity' => 4,
         ];
 
