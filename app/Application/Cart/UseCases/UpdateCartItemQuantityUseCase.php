@@ -33,17 +33,16 @@ readonly class UpdateCartItemQuantityUseCase
         $cartItem = $cart->cartItems
             ->first(fn(CartItem $item) => $item->id->equals(UuidVO::fromString($cartItemId)));
 
-        $product = $cartItem->product();
+        $product = $this->productRepository->findByIdOrFail($cartItem->productId);
 
         $quantityDifference = $newQuantity - $cartItem->quantity;
 
-        $updatedStock = $product->stock - $quantityDifference;
-
-        if ($quantityDifference > 0 && $updatedStock < 0) {
-            throw new InsufficientStockException($product->name, $product->stock);
+        if ($quantityDifference > 0) {
+            $product->decreaseStock($quantityDifference);
+        } else {
+            $product->increaseStock(abs($quantityDifference));
         }
 
-        $product->stock = $updatedStock;
         $this->productRepository->save($product);
 
         $cart->updateCartItemQuantity(
