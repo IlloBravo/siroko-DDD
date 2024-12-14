@@ -12,5 +12,6 @@ abstract class TestCase extends BaseTestCase
     {
         parent::setUp();
 
-        $this->artisan('migrate', ['--seed' => true]);    }
+        $this->artisan('migrate', ['--seed' => true]);
+    }
 }
