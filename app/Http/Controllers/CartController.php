@@ -113,8 +113,7 @@ class CartController extends Controller
     {
         $this->checkoutCartUseCase->execute($cartId);
 
-        return redirect()->route('cart.show', ['cartId' => $cartId])
-            ->with('success', __('Cart.cart_checked_out'));
+        return redirect()->route('cart.thank-you');
     }
 
     public function index(): View
@@ -132,6 +131,6 @@ class CartController extends Controller
 
     public function thankYou(): View
     {
-        return view('cart.thankyou');
+        return view('cart.thank-you');
     }
 }

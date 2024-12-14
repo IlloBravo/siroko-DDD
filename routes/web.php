@@ -15,4 +15,4 @@ Route::get('/all-carts-created', [CartController::class, 'index'])->name('cart.i
 
 Route::get('/cart/{cartId}/view', [CartController::class, 'show'])->name('cart.show');
 
-Route::get('/cart/{cartId}/thank-you', [CartController::class, 'thankYou'])->name('cart.thankyou');
+Route::get('/thank-you', [CartController::class, 'thankYou'])->name('cart.thank-you');
