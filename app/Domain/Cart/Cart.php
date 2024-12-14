@@ -2,12 +2,8 @@
 
 namespace App\Domain\Cart;
 
-use App\Domain\Cart\Exceptions\CartItemNotFoundException;
-use App\Domain\Cart\Exceptions\CartNotFoundException;
-use App\Domain\Shared\Exceptions\InvalidQuantityException;
 use App\Domain\Shared\ValueObjects\UuidVO;
 use Illuminate\Support\Collection;
-use App\Domain\Cart\Repository\CartItemRepositoryInterface;
 
 final class Cart
 {
