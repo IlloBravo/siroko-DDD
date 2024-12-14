@@ -13,7 +13,6 @@ use App\Domain\Cart\Repository\CartRepositoryInterface;
 use App\Domain\Product\Exceptions\InsufficientStockException;
 use App\Domain\Product\Exceptions\ProductNotFoundException;
 use App\Domain\Shared\ValueObjects\UuidVO;
-use Exception;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
