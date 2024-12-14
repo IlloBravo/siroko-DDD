@@ -32,11 +32,6 @@ final class Cart
         );
     }
 
-    public function getItems(): Collection
-    {
-        return $this->cartItems;
-    }
-
     public function addCartItem(CartItem $newCartItem, int $quantity): void
     {
         $existingCartItem = $this->cartItems
