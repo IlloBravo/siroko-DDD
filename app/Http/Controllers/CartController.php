@@ -30,8 +30,6 @@ class CartController extends Controller
     ) {}
 
     /**
-     * Añadir productos al carrito
-     *
      * @throws CartNotFoundException
      * @throws ProductNotFoundException
      * @throws InsufficientStockException

@@ -20,6 +20,7 @@ readonly class AddProductToCartUseCase
 
     /**
      * @throws CartNotFoundException
+     * @throws ProductNotFoundException
      * @throws InsufficientStockException
      */
     public function execute(string $cartId, string $productId, int $quantity): void
@@ -39,7 +40,7 @@ readonly class AddProductToCartUseCase
         );
 
         $this->cartItemRepository->save($cartItem);;
-        $this->productRepository->decreaseStock($product->id, $quantity);
+        $product->decreaseStock($quantity);
         $this->productRepository->save($product);
 
         $cart->addProduct($cartItem, $this->cartItemRepository);

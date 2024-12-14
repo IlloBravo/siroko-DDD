@@ -3,9 +3,8 @@
 namespace App\Infrastructure\Repositories;
 
 use App\Domain\Cart\CartItem;
-use App\Domain\Cart\Exceptions\CartNotFoundException;
+use App\Domain\Cart\Exceptions\CartItemNotFoundException;
 use App\Domain\Cart\Repository\CartItemRepositoryInterface;
-use App\Domain\Product\Product;
 use App\Domain\Shared\Exceptions\InvalidQuantityException;
 use App\Domain\Shared\ValueObjects\UuidVO;
 use Illuminate\Support\Facades\DB;
@@ -17,7 +16,7 @@ class EloquentCartItemRepository implements CartItemRepositoryInterface
         $cartItemData = DB::table('cart_items')->where('id', (string) $id)->first();
 
         if (!$cartItemData) {
-            throw new CartNotFoundException($id);
+            throw new CartItemNotFoundException($id);
         }
 
         return CartItem::fromDatabase($cartItemData);

@@ -27,4 +27,14 @@ class Product
     {
         return $this->stock >= $quantity;
     }
+
+    public function decreaseStock(int $quantity): void
+    {
+        $this->stock -= $quantity;
+    }
+
+    public function increaseStock(int $quantity): void
+    {
+        $this->stock += $quantity;
+    }
 }

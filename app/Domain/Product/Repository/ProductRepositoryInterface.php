@@ -15,6 +15,4 @@ interface ProductRepositoryInterface
     public function findByIdOrFail(UuidVO $id): Product;
     public function findAll(): Collection;
     public function save(Product $product): void;
-    public function increaseStock(UuidVO $productId, int $quantity): void;
-    public function decreaseStock(UuidVO $productId, int $quantity): void;
 }
