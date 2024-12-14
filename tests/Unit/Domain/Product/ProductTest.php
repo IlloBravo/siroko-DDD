@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Domain\Product;
 
+use App\Domain\Product\Exceptions\InsufficientStockException;
 use App\Domain\Product\Product;
 use App\Domain\Shared\ValueObjects\UuidVO;
 use PHPUnit\Framework\TestCase;
@@ -58,5 +59,12 @@ class ProductTest extends TestCase
     {
         $this->product->decreaseStock(10);
         $this->assertEquals(0, $this->product->stock);
+    }
+
+    public function testDecreaseStockThrowsExceptionWhenInsufficient(): void
+    {
+        $this->expectException(InsufficientStockException::class);
+
+        $this->product->decreaseStock(15);
     }
 }

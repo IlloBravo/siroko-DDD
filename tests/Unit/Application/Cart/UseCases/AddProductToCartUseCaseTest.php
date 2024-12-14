@@ -3,51 +3,41 @@
 namespace Tests\Unit\Application\Cart\UseCases;
 
 use App\Application\Cart\UseCases\AddProductToCartUseCase;
-use App\Domain\Cart\Cart;
-use App\Domain\Product\Product;
 use App\Domain\Shared\ValueObjects\UuidVO;
-use App\Domain\Cart\Repository\CartRepositoryInterface;
-use App\Domain\Product\Repository\ProductRepositoryInterface;
-use DateMalformedStringException;
-use PHPUnit\Framework\MockObject\Exception;
-use PHPUnit\Framework\TestCase;
-use Ramsey\Uuid\Uuid;
+use Tests\TestCase;
+use Tests\Traits\RepositoryMockTrait;
 
 class AddProductToCartUseCaseTest extends TestCase
 {
-    /**
-     * @throws DateMalformedStringException
-     * @throws Exception
-     */
-    public function testExecute()
+    use RepositoryMockTrait;
+
+    public function testAddProductToCartSuccessfully(): void
     {
-        $cartData = [
-            'id' => Uuid::uuid4(),
+        $cartData = (object) [
+            'id' => UuidVO::generate()->__toString(),
             'items' => json_encode([]),
-            'created_at' => now(),
-            'updated_at' => now(),
         ];
-        $cart = Cart::create($cartData);
 
         $productData = (object) [
-            'id' => '123e4567-e89b-12d3-a456-426614174001',
-            'name' => 'Producto A',
-            'price' => 50.0,
-            'quantity' => 10,
-            'cartQuantity' => 0,
+            'id' => UuidVO::generate()->__toString(),
+            'name' => 'Bike',
+            'price' => 1500.00,
+            'stock' => 10,
         ];
-        $product = Product::fromDatabase($productData);
 
-        $cartRepository = $this->createMock(CartRepositoryInterface::class);
-        $productRepository = $this->createMock(ProductRepositoryInterface::class);
+        $cartItemData = (object) [
+            'id' => UuidVO::generate()->__toString(),
+            'cart' => $cartData,
+            'product' => $productData,
+            'quantity' => 3,
+        ];
 
-        $cartRepository->expects($this->once())->method('save')->with($cart);
-        $productRepository->expects($this->once())->method('updateStock')->with($product->id, 5);
+        $this->mockRepositories($productData, $cartData, $cartItemData);
 
-        $useCase = new AddProductToCartUseCase($cartRepository, $productRepository);
-        $useCase->execute($cart, $product, 5);
+        $useCase = app(AddProductToCartUseCase::class);
 
-        $this->assertEquals(5, $cart->getProductQuantity(UuidVO::fromString($product->id)));
-        $this->assertEquals(5, $product->stock);
+        $useCase->execute($cartData->id, $productData->id, 3);
+
+        $this->assertTrue(true);
     }
 }

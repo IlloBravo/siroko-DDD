@@ -27,10 +27,6 @@ readonly class AddProductToCartUseCase
     {
         $product = $this->productRepository->findByIdOrFail(UuidVO::fromString($productId));
 
-        if (!$product->hasSufficientStock($quantity)) {
-            throw new InsufficientStockException($product->name, $product->stock);
-        }
-
         $cart = $this->cartRepository->findByIdOrFail(UuidVO::fromString($cartId));
 
         $cartItem = $this->cartItemRepository->create(
