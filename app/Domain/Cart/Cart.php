@@ -37,21 +37,15 @@ final class Cart
         return $this->cartItems;
     }
 
-    public function addProduct(CartItem $newCartItem, CartItemRepositoryInterface $cartItemRepository): void
+    public function addCartItem(CartItem $newCartItem, int $quantity): void
     {
         $existingCartItem = $this->cartItems
-            ->first(fn(CartItem $item) => $item->productId->equals($newCartItem->productId));
+            ->first(fn(CartItem $item) => $item->id->equals($newCartItem->id));
 
         if ($existingCartItem) {
-            $newQuantity = $existingCartItem->quantity + $newCartItem->quantity;
-
-            $cartItemRepository->updateQuantity($existingCartItem->id, $newQuantity);
-
-            $existingCartItem->quantity = $newQuantity;
+            $existingCartItem->quantity = $quantity;
         } else {
             $this->cartItems->push($newCartItem);
-
-            $cartItemRepository->save($newCartItem);
         }
     }
 
