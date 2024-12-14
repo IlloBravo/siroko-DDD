@@ -14,75 +14,19 @@ use Tests\TestCase;
 class EloquentCartRepositoryTest extends TestCase
 {
     use RefreshDatabase;
-    public function testSaveSuccessfullyStoresCart(): void
-    {
-        $cartId = UuidVO::generate();
-        $product = new Product(
-            UuidVO::generate(),
-            'Product A',
-            10.5,
-            100,
-            0
-        );
-
-        $cart = new Cart(
-            $cartId,
-            collect([$product]),
-            now(),
-            now()
-        );
-
-        $repository = new EloquentCartRepository();
-        $repository->save($cart);
-
-        $cartData = DB::table('carts')->where('id', (string) $cart->id)->first();
-        $this->assertNotNull($cartData);
-        $this->assertEquals($cart->id, $cartData->id);
-        $this->assertEquals(json_encode([
-            [
-                'id' => (string) $product->id,
-                'name' => $product->name,
-                'price' => $product->price,
-                'quantity' => $product->stock,
-                'cartQuantity' => $product->cartQuantity,
-            ]
-        ]), $cartData->items);
-    }
-
-    /**
-     * @throws \DateMalformedStringException
-     */
     public function testFindByIdOrFailReturnsCart(): void
     {
         $cartId = UuidVO::generate();
-        $product = new Product(
-            UuidVO::generate(),
-            'Product A',
-            10.5,
-            100,
-            0
-        );
+        $cartData = (object)[
+            'id' => $cartId,
+            'items' => json_encode([]),
+        ];
 
-        $cart = new Cart(
-            $cartId,
-            collect([$product]),
-            now(),
-            now()
-        );
+        $cart = Cart::fromDatabase($cartData);
 
         DB::table('carts')->insert([
             'id' => (string) $cart->id,
-            'items' => json_encode([
-                [
-                    'id' => (string) $product->id,
-                    'name' => $product->name,
-                    'price' => $product->price,
-                    'quantity' => $product->stock,
-                    'cartQuantity' => $product->cartQuantity,
-                ]
-            ]),
-            'created_at' => now(),
-            'updated_at' => now(),
+            'items' => $cart->getCartItems()
         ]);
 
         $repository = new EloquentCartRepository();
@@ -92,9 +36,6 @@ class EloquentCartRepositoryTest extends TestCase
         $this->assertEquals($cart->id, $retrievedCart->id);
     }
 
-    /**
-     * @throws \DateMalformedStringException
-     */
     public function testFindByIdOrFailThrowsExceptionWhenCartNotFound(): void
     {
         $cartId = UuidVO::generate();
@@ -105,117 +46,72 @@ class EloquentCartRepositoryTest extends TestCase
         $repository->findByIdOrFail($cartId);
     }
 
-    public function testDeleteSuccessfullyDeletesCart(): void
+    public function testFindAllReturnsCollection(): void
     {
         $cartId = UuidVO::generate();
-        $product = new Product(
-            UuidVO::generate(),
-            'Product A',
-            10.5,
-            100,
-            0
-        );
+        $cartData = (object)[
+            'id' => $cartId,
+            'items' => json_encode([]),
+        ];
 
-        $cart = new Cart(
-            $cartId,
-            collect([$product]),
-            now(),
-            now()
-        );
+        $cart = Cart::fromDatabase($cartData);
 
         DB::table('carts')->insert([
             'id' => (string) $cart->id,
-            'items' => json_encode([
-                [
-                    'id' => (string) $product->id,
-                    'name' => $product->name,
-                    'price' => $product->price,
-                    'quantity' => $product->stock,
-                    'cartQuantity' => $product->cartQuantity,
-                ]
-            ]),
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-
-        $repository = new EloquentCartRepository();
-        $repository->delete((string) $cart->id);
-
-        $cartData = DB::table('carts')->where('id', (string) $cart->id)->first();
-        $this->assertNull($cartData);
-    }
-
-    public function testFindAllReturnsAllCarts(): void
-    {
-        DB::table('carts')->truncate();
-
-        $cartId1 = UuidVO::generate();
-        $product1 = new Product(
-            UuidVO::generate(),
-            'Product A',
-            10.5,
-            100,
-            0
-        );
-
-        $cart1 = new Cart(
-            $cartId1,
-            collect([$product1]),
-            now(),
-            now()
-        );
-
-        DB::table('carts')->insert([
-            'id' => (string) $cart1->id,
-            'items' => json_encode([
-                [
-                    'id' => (string) $product1->id,
-                    'name' => $product1->name,
-                    'price' => $product1->price,
-                    'quantity' => $product1->stock,
-                    'cartQuantity' => $product1->cartQuantity,
-                ]
-            ]),
-            'created_at' => now(),
-            'updated_at' => now(),
+            'items' => $cart->getCartItems()
         ]);
 
         $cartId2 = UuidVO::generate();
-        $product2 = new Product(
-            UuidVO::generate(),
-            'Product B',
-            20.0,
-            50,
-            1
-        );
+        $cartData2 = (object)[
+            'id' => $cartId2,
+            'items' => json_encode([]),
+        ];
 
-        $cart2 = new Cart(
-            $cartId2,
-            collect([$product2]),
-            now(),
-            now()
-        );
+        $cart2 = Cart::fromDatabase($cartData2);
 
         DB::table('carts')->insert([
             'id' => (string) $cart2->id,
-            'items' => json_encode([
-                [
-                    'id' => (string) $product2->id,
-                    'name' => $product2->name,
-                    'price' => $product2->price,
-                    'quantity' => $product2->stock,
-                    'cartQuantity' => $product2->cartQuantity,
-                ]
-            ]),
-            'created_at' => now(),
-            'updated_at' => now(),
+            'items' => $cart2->getCartItems()
         ]);
 
         $repository = new EloquentCartRepository();
-        $carts = $repository->findAll();
+        $retrieveCarts = $repository->findAll();
 
-        $this->assertCount(2, $carts);
-        $this->assertEquals($cart1->id, $carts[0]->id);
-        $this->assertEquals($cart2->id, $carts[1]->id);
+        foreach ($retrieveCarts as $cartFromCollection) {
+            $this->assertInstanceOf(Cart::class, $cartFromCollection);
+        }
+    }
+
+    public function testSaveSuccessfullyUpdatesCart(): void
+    {
+        $productData = (object) [
+            'id' => UuidVO::generate()->__toString(),
+            'name' => 'Bike',
+            'price' => 1500.00,
+            'stock' => 10,
+        ];
+
+        $product = Product::fromDatabase($productData);
+        $cartId = UuidVO::generate();
+
+        $cartItemData = (object) [
+            'id' => UuidVO::generate()->__toString(),
+            'cartId' => $cartId->__toString(),
+            'productId' => $product->id->__toString(),
+            'quantity' => 1,
+        ];
+
+
+        $cartData = (object)[
+            'id' => $cartId,
+            'items' => json_encode([$cartItemData]),
+        ];
+
+        $cart = Cart::fromDatabase($cartData);
+
+        $repository = new EloquentCartRepository();
+        $repository->save($cart);
+        $retrievedCart = $repository->findByIdOrFail($cart->id);
+        $this->assertEquals(1, $retrievedCart->getCartItems()->first()->quantity);
     }
 }

@@ -48,9 +48,4 @@ class EloquentCartRepository implements CartRepositoryInterface
             ['items' => json_encode($cartItemsData)]
         );
     }
-
-    public function delete(UuidVO $id): void
-    {
-        DB::table('carts')->where('id', $id)->delete();
-    }
 }

@@ -27,11 +27,4 @@ interface CartRepositoryInterface
      * @param Cart $cart
      */
     public function save(Cart $cart): void;
-
-    /**
-     * Delete a cart by its ID.
-     *
-     * @param UuidVO $id
-     */
-    public function delete(UuidVO $id): void;
 }

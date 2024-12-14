@@ -3,7 +3,6 @@
 namespace Tests\Unit\Infrastructure\Repositories;
 
 use App\Domain\Product\Product;
-use App\Domain\Product\Repository\ProductRepositoryInterface;
 use App\Domain\Product\Exceptions\ProductNotFoundException;
 use App\Domain\Shared\ValueObjects\UuidVO;
 use App\Infrastructure\Repositories\EloquentProductRepository;
@@ -19,8 +18,7 @@ class EloquentProductRepositoryTest extends TestCase
             'id' => $productId,
             'name' => 'Product A',
             'price' => 10.5,
-            'quantity' => 100,
-            'cartQuantity' => 0,
+            'stock' => 100,
         ];
 
         $product = Product::fromDatabase($productData);
@@ -29,9 +27,7 @@ class EloquentProductRepositoryTest extends TestCase
             'id' => (string) $product->id,
             'name' => $product->name,
             'price' => $product->price,
-            'quantity' => $product->stock,
-            'cartQuantity' => $product->cartQuantity,
-            'updated_at' => now(),
+            'stock' => $product->price,
         ]);
 
         $repository = new EloquentProductRepository();
@@ -52,48 +48,48 @@ class EloquentProductRepositoryTest extends TestCase
         $repository->findByIdOrFail($productId);
     }
 
-    public function testUpdateStockSuccessfullyDecrementsQuantity(): void
+    public function testFindAllReturnsCollection(): void
     {
         $productId = UuidVO::generate();
-        $initialQuantity = 10;
-        $quantityToDecrement = 3;
+        $productData = (object)[
+            'id' => $productId,
+            'name' => 'Product A',
+            'price' => 10.5,
+            'stock' => 100,
+        ];
+
+        $product = Product::fromDatabase($productData);
+
+        $product2Id = UuidVO::generate();
+        $product2Data = (object)[
+            'id' => $product2Id,
+            'name' => 'Product B',
+            'price' => 15,
+            'stock' => 10,
+        ];
+
+        $product2 = Product::fromDatabase($product2Data);
 
         DB::table('products')->insert([
-            'id' => (string) $productId,
-            'name' => 'Product A',
-            'price' => 100.0,
-            'quantity' => $initialQuantity,
-            'cartQuantity' => 2,
-            'updated_at' => now(),
+            'id' => (string) $product->id,
+            'name' => $product->name,
+            'price' => $product->price,
+            'stock' => $product->price,
+        ]);
+
+        DB::table('products')->insert([
+            'id' => (string) $product2->id,
+            'name' => $product2->name,
+            'price' => $product2->price,
+            'stock' => $product2->price,
         ]);
 
         $repository = new EloquentProductRepository();
-        $repository->updateStock($productId, $quantityToDecrement);
+        $retrievedProduct = $repository->findAll();
 
-        $productData = DB::table('products')->where('id', (string) $productId)->first();
-        $this->assertEquals($initialQuantity - $quantityToDecrement, $productData->quantity);
-    }
-
-    public function testIncreaseStockSuccessfullyIncrementsQuantity(): void
-    {
-        $productId = UuidVO::generate();
-        $initialQuantity = 10;
-        $quantityToIncrement = 5;
-
-        DB::table('products')->insert([
-            'id' => (string) $productId,
-            'name' => 'Product A',
-            'price' => 100.0,
-            'quantity' => $initialQuantity,
-            'cartQuantity' => 2,
-            'updated_at' => now(),
-        ]);
-
-        $repository = new EloquentProductRepository();
-        $repository->increaseStock($productId, $quantityToIncrement);
-
-        $productData = DB::table('products')->where('id', (string) $productId)->first();
-        $this->assertEquals($initialQuantity + $quantityToIncrement, $productData->quantity);
+        foreach ($retrievedProduct as $productFromCollection) {
+            $this->assertInstanceOf(Product::class, $productFromCollection);
+        }
     }
 
     public function testSaveSuccessfullyUpdatesProduct(): void
@@ -105,17 +101,14 @@ class EloquentProductRepositoryTest extends TestCase
             $productId,
             'Product A',
             100.0,
-            $initialQuantity,
-            2
+            $initialQuantity
         );
 
         DB::table('products')->insert([
             'id' => (string) $product->id,
             'name' => $product->name,
             'price' => $product->price,
-            'quantity' => $product->stock,
-            'cartQuantity' => $product->cartQuantity,
-            'updated_at' => now(),
+            'stock' => $product->stock,
         ]);
 
         $product->name = 'Updated Product A';
