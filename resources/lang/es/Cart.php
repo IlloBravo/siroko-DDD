@@ -10,6 +10,7 @@ return [
     'product_updated' => 'Cantidad del producto actualizada a :quantity',
     'item_removed' => 'Producto eliminado del carrito',
     'cart_not_found' => 'Carrito con ID :id no encontrado',
+    'cart_item_not_found' => 'Item de carrito con ID :id no encontrado',
     'cart_checked_out' => 'Carrito finalizado con éxito',
     'available_products' => 'Productos Disponibles',
     'your_cart' => 'Tu Carrito',

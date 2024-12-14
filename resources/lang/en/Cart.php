@@ -10,6 +10,7 @@ return [
     'product_updated' => 'Product quantity updated to :quantity',
     'product_removed' => 'Product removed from cart',
     'cart_not_found' => 'Cart with ID :id not found',
+    'cart_item_not_found' => 'Cart Item with ID :id not found',
     'cart_checked_out' => 'Cart checked out successfully',
     'available_products' => 'Available Products',
     'your_cart' => 'Your Cart',
