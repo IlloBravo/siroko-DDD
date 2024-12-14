@@ -22,7 +22,7 @@ class CartController extends Controller
 {
     public function __construct(
         private readonly AddProductToCartUseCase       $addProductToCartUseCase,
-        private readonly UpdateCartItemQuantityUseCase $updateProductQuantityUseCase,
+        private readonly UpdateCartItemQuantityUseCase $updateCartItemQuantityUseCase,
         private readonly RemoveProductFromCartUseCase  $removeProductFromCartUseCase,
         private readonly GetTotalProductsUseCase       $getTotalProductsUseCase,
         private readonly CheckoutCartUseCase           $checkoutCartUseCase,
@@ -60,12 +60,12 @@ class CartController extends Controller
      */
     public function updateCart(Request $request, string $cartId): JsonResponse|RedirectResponse
     {
-        $productsData = $request->input('products');
+        $cartItemsData = $request->input('products');
 
         try {
-            foreach ($productsData as $productId => $productData) {
-                $quantity = (int) $productData['quantity'];
-                $this->updateProductQuantityUseCase->execute($cartId, $productId, $quantity);
+            foreach ($cartItemsData as $cartItemId => $cartItemData) {
+                $quantity = (int) $cartItemData['quantity'];
+                $this->updateCartItemQuantityUseCase->execute($cartId, $cartItemId, $quantity);
             }
 
             if ($request->ajax()) {

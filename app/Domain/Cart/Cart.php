@@ -2,6 +2,7 @@
 
 namespace App\Domain\Cart;
 
+use App\Domain\Cart\Exceptions\CartItemNotFoundException;
 use App\Domain\Cart\Exceptions\CartNotFoundException;
 use App\Domain\Shared\Exceptions\InvalidQuantityException;
 use App\Domain\Shared\ValueObjects\UuidVO;
@@ -44,20 +45,10 @@ final class Cart
         }
     }
 
-    public function updateProductQuantity(UuidVO $productId, int $newQuantity, CartItemRepositoryInterface $cartItemRepository): void
+    public function updateCartItemQuantity(CartItem $cartItemId, int $newQuantity): void
     {
         $cartItem = $this->cartItems
-            ->first(fn(CartItem $item) => $item->productId->equals($productId));
-
-        if (!$cartItem) {
-            throw new CartNotFoundException($this->id);
-        }
-
-        if ($newQuantity < 1) {
-            throw new InvalidQuantityException($newQuantity);
-        }
-
-        $cartItemRepository->updateQuantity($cartItem->id, $newQuantity);
+            ->first(fn(CartItem $item) => $item->id->equals($cartItemId->id));
 
         $cartItem->quantity = $newQuantity;
     }
