@@ -76,9 +76,15 @@
                     data: $(this).serialize(),
                     success: function (response) {
                         $('#alert-container').html('<div class="alert alert-success">' + response.message + '</div>');
+                        setTimeout(() => {
+                            $('#alert-container').fadeOut('slow');
+                        }, 5000);
                     },
                     error: function (xhr) {
                         $('#alert-container').html('<div class="alert alert-danger">' + xhr.responseJSON.error + '</div>');
+                        setTimeout(() => {
+                            $('#alert-container').fadeOut('slow');
+                        }, 5000);
                     }
                 });
             });

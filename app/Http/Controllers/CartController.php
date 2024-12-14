@@ -29,11 +29,6 @@ class CartController extends Controller
         private readonly CartRepositoryInterface       $cartRepository
     ) {}
 
-    /**
-     * @throws CartNotFoundException
-     * @throws ProductNotFoundException
-     * @throws InsufficientStockException
-     */
     public function addCartItem(Request $request, string $cartId): JsonResponse
     {
         $validatedData = $request->validate([
@@ -55,9 +50,6 @@ class CartController extends Controller
         ]);
     }
 
-    /**
-     * @throws CartNotFoundException
-     */
     public function updateCart(Request $request, string $cartId): JsonResponse|RedirectResponse
     {
         $cartItemsData = $request->input('products');
@@ -75,9 +67,6 @@ class CartController extends Controller
         }
     }
 
-    /**
-     * @throws Exception
-     */
     public function removeCartItem(string $cartId, string $cartItemId): RedirectResponse
     {
         $this->removeProductFromCartUseCase->execute($cartId, $cartItemId);
@@ -86,9 +75,6 @@ class CartController extends Controller
             ->with('success', __('Cart.cart_checked_out'));
     }
 
-    /**
-     * @throws Exception
-     */
     public function getTotalProducts(string $cartId): JsonResponse
     {
         $total = $this->getTotalProductsUseCase->execute($cartId);
@@ -96,9 +82,6 @@ class CartController extends Controller
         return response()->json(['total_products' => $total]);
     }
 
-    /**
-     * @throws Exception
-     */
     public function checkout(string $cartId): View
     {
         $this->checkoutCartUseCase->execute($cartId);
