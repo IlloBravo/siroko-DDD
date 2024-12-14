@@ -7,6 +7,7 @@ use App\Domain\Cart\Exceptions\CartItemNotFoundException;
 use App\Domain\Cart\Exceptions\CartNotFoundException;
 use App\Domain\Cart\Repository\CartItemRepositoryInterface;
 use App\Domain\Cart\Repository\CartRepositoryInterface;
+use App\Domain\Product\Exceptions\ProductNotFoundException;
 use App\Domain\Product\Repository\ProductRepositoryInterface;
 use App\Domain\Shared\ValueObjects\UuidVO;
 
@@ -20,6 +21,8 @@ readonly class RemoveProductFromCartUseCase
 
     /**
      * @throws CartNotFoundException
+     * @throws CartItemNotFoundException
+     * @throws ProductNotFoundException
      */
     public function execute(string $cartId, string $cartItemId): void
     {

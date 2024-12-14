@@ -58,11 +58,20 @@
                             _token: '{{ csrf_token() }}'
                         },
                         success: function (response) {
-                            alert('Producto eliminado exitosamente.');
-                            location.reload();
+                            $('#alert-container').html('<div class="alert alert-success">' + response.message + '</div>');
+                            setTimeout(() => {
+                                $('#alert-container').fadeOut('slow', function () {
+                                    location.reload();
+                                });
+                            }, 3000);
                         },
-                        error: function () {
-                            alert('Error al eliminar el producto.');
+                        error: function (xhr) {
+                            $('#alert-container').html('<div class="alert alert-danger">' + xhr.responseJSON.error + '</div>');
+                            setTimeout(() => {
+                                $('#alert-container').fadeOut('slow', function () {
+                                    location.reload();
+                            });
+                            }, 3000);
                         }
                     });
                 }
@@ -78,13 +87,15 @@
                         $('#alert-container').html('<div class="alert alert-success">' + response.message + '</div>');
                         setTimeout(() => {
                             $('#alert-container').fadeOut('slow');
-                        }, 5000);
+                        }, 3000);
                     },
                     error: function (xhr) {
                         $('#alert-container').html('<div class="alert alert-danger">' + xhr.responseJSON.error + '</div>');
                         setTimeout(() => {
-                            $('#alert-container').fadeOut('slow');
-                        }, 5000);
+                            $('#alert-container').fadeOut('slow', function () {
+                                location.reload();
+                        });
+                        }, 3000);
                     }
                 });
             });

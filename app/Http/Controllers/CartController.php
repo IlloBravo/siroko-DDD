@@ -7,6 +7,7 @@ use App\Application\Cart\UseCases\UpdateCartItemQuantityUseCase;
 use App\Application\Cart\UseCases\RemoveProductFromCartUseCase;
 use App\Application\Cart\UseCases\GetTotalProductsUseCase;
 use App\Application\Cart\UseCases\CheckoutCartUseCase;
+use App\Domain\Cart\Exceptions\CartItemNotFoundException;
 use App\Domain\Cart\Exceptions\CartNotFoundException;
 use App\Domain\Cart\Repository\CartRepositoryInterface;
 use App\Domain\Product\Exceptions\InsufficientStockException;
@@ -67,12 +68,14 @@ class CartController extends Controller
         }
     }
 
-    public function removeCartItem(string $cartId, string $cartItemId): RedirectResponse
+    public function removeCartItem(string $cartId, string $cartItemId): JsonResponse
     {
-        $this->removeProductFromCartUseCase->execute($cartId, $cartItemId);
-
-        return redirect()->route('cart.show', ['cartId' => $cartId])
-            ->with('success', __('Cart.cart_checked_out'));
+        try {
+            $this->removeProductFromCartUseCase->execute($cartId, $cartItemId);
+            return response()->json(['message' => __('Cart.item_removed')]);
+        } catch (CartNotFoundException|CartItemNotFoundException|ProductNotFoundException $e) {
+            return response()->json(['error' => $e->getMessage()], 404);
+        }
     }
 
     public function getTotalProducts(string $cartId): JsonResponse
