@@ -88,9 +88,9 @@ class CartController extends Controller
     /**
      * @throws Exception
      */
-    public function removeProduct(string $cartId, string $productId): RedirectResponse
+    public function removeCartItem(string $cartId, string $cartItemId): RedirectResponse
     {
-        $this->removeProductFromCartUseCase->execute($cartId, $productId);
+        $this->removeProductFromCartUseCase->execute($cartId, $cartItemId);
 
         return redirect()->route('cart.index')
             ->with('success', __('Cart.cart_checked_out'));

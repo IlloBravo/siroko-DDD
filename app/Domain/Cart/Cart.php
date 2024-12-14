@@ -73,10 +73,10 @@ final class Cart
         $cartItem->quantity = $newQuantity;
     }
 
-    public function removeProduct(UuidVO $productId): void
+    public function removeCartItem(UuidVO $cartItemId): void
     {
         $this->cartItems = $this->cartItems
-            ->reject(fn(CartItem $item) => $item->productId->equals($productId));
+            ->reject(fn(CartItem $item) => $item->id->equals($cartItemId));
     }
 
     public function checkout(): void
