@@ -85,7 +85,7 @@
 
                 // Enviar la solicitud AJAX
                 $.ajax({
-                    url: '{{ route('api.cart.addProduct', ['cartId' => ':cartId']) }}'.replace(':cartId', cartId), // URL dinámica para el carrito
+                    url: '{{ route('api.cart.addCartItem', ['cartId' => ':cartId']) }}'.replace(':cartId', cartId), // URL dinámica para el carrito
                     method: 'POST',
                     data: JSON.stringify(payload),
                     contentType: 'application/json',

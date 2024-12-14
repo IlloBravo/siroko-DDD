@@ -34,7 +34,7 @@ class CartController extends Controller
      * @throws ProductNotFoundException
      * @throws InsufficientStockException
      */
-    public function addProduct(Request $request, string $cartId): JsonResponse
+    public function addCartItem(Request $request, string $cartId): JsonResponse
     {
         $validatedData = $request->validate([
             'products' => 'required|array|min:1',
@@ -58,7 +58,7 @@ class CartController extends Controller
     /**
      * @throws CartNotFoundException
      */
-    public function updateProduct(Request $request, string $cartId): JsonResponse|RedirectResponse
+    public function updateCart(Request $request, string $cartId): JsonResponse|RedirectResponse
     {
         $productsData = $request->input('products');
 

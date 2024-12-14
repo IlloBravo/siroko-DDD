@@ -5,7 +5,7 @@
 
     <div id="alert-container"></div>
 
-    <form id="update-cart-form" action="{{ route('api.cart.updateProduct', ['cartId' => $cart->id]) }}" method="POST">
+    <form id="update-cart-form" action="{{ route('api.cart.updateCart', ['cartId' => $cart->id]) }}" method="POST">
         @csrf
         @method('PUT')
 
