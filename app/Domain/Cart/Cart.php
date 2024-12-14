@@ -40,10 +40,10 @@ final class Cart
     public function addCartItem(CartItem $newCartItem, int $quantity): void
     {
         $existingCartItem = $this->cartItems
-            ->first(fn(CartItem $item) => $item->id->equals($newCartItem->id));
+            ->first(fn(CartItem $item) => $item->productId->equals($newCartItem->productId));
 
         if ($existingCartItem) {
-            $existingCartItem->quantity = $quantity;
+            $existingCartItem->quantity += $quantity;
         } else {
             $this->cartItems->push($newCartItem);
         }
