@@ -7,9 +7,15 @@ use RuntimeException;
 
 final class InsufficientStockException extends RuntimeException
 {
-    public function __construct(string $productId)
+    public function __construct(string $productName, int $stock)
     {
-        $message = Lang::get('Product.insufficient_stock', ['id' => $productId]);
+        $message = Lang::get('Product.insufficient_stock',
+            [
+                'name' => $productName,
+                'stock' => $stock
+            ]
+        );
+
         parent::__construct($message);
     }
 }

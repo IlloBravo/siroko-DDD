@@ -68,20 +68,10 @@ class CartController extends Controller
                 $this->updateCartItemQuantityUseCase->execute($cartId, $cartItemId, $quantity);
             }
 
-            if ($request->ajax()) {
-                return response()->json(['message' => __('Cart.cart_updated')]);
-            }
-
-            return redirect()->route('cart.show', ['cartId' => $cartId])
-                ->with('success', __('Cart.cart_updated'));
+            return response()->json(['message' => __('Cart.cart_updated')]);
 
         } catch (InsufficientStockException $e) {
-            if ($request->ajax()) {
-                return response()->json(['error' => $e->getMessage()], 400);
-            }
-
-            return redirect()->route('cart.show', ['cartId' => $cartId])
-                ->with('error', $e->getMessage());
+            return response()->json(['error' => $e->getMessage()], 400);
         }
     }
 

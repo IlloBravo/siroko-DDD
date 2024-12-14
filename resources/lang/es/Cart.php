@@ -32,4 +32,5 @@ return [
     'add_product_error' => 'Error al añadir el producto al carrito',
     'products' => 'Productos',
     'cart_updated' => 'Carrito actualizado',
+    'no_products_selected' => 'Debe añadir al menos un producto al carrito',
 ];

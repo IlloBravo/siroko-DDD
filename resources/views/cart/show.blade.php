@@ -78,11 +78,7 @@
                         $('#alert-container').html('<div class="alert alert-success">' + response.message + '</div>');
                     },
                     error: function (xhr) {
-                        if (xhr.responseJSON && xhr.responseJSON.error) {
-                            $('#alert-container').html('<div class="alert alert-danger">' + xhr.responseJSON.error + '</div>');
-                        } else {
-                            $('#alert-container').html('<div class="alert alert-danger">Error al actualizar el carrito.</div>');
-                        }
+                        $('#alert-container').html('<div class="alert alert-danger">' + xhr.responseJSON.error + '</div>');
                     }
                 });
             });

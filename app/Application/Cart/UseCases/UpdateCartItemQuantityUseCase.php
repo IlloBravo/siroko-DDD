@@ -40,7 +40,7 @@ readonly class UpdateCartItemQuantityUseCase
         $updatedStock = $product->stock - $quantityDifference;
 
         if ($quantityDifference > 0 && $updatedStock < 0) {
-            throw new InsufficientStockException($product->id->value());
+            throw new InsufficientStockException($product->name, $product->stock);
         }
 
         $product->stock = $updatedStock;
