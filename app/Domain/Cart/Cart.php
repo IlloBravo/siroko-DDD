@@ -92,7 +92,7 @@ final class Cart
     public function total(): float
     {
         return $this->cartItems->sum(
-            fn(CartItem $item) => $item->product->price * $item->quantity
+            fn(CartItem $item) => $item->product()->price * $item->quantity
         );
     }
 }
