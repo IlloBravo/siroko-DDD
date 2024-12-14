@@ -11,8 +11,7 @@ Route::get('/', function () {
 
 Route::get('/all-products-available', [ProductController::class, 'index'])->name('products.index');
 
-Route::get('/all-carts-created', [CartController::class, 'index'])->name('cart.index');
-
-Route::get('/cart/{cartId}/view', [CartController::class, 'show'])->name('cart.show');
-
-Route::get('/thank-you', [CartController::class, 'thankYou'])->name('cart.thank-you');
+Route::prefix('/{cartId}')->group(function () {
+    Route::get('/cart/view', [CartController::class, 'show'])->name('cart.show');
+    Route::get('/thank-you', [CartController::class, 'checkout'])->name('cart.thank-you');
+});

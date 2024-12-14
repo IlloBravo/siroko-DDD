@@ -92,7 +92,7 @@ class CartController extends Controller
     {
         $this->removeProductFromCartUseCase->execute($cartId, $cartItemId);
 
-        return redirect()->route('cart.index')
+        return redirect()->route('cart.show', ['cartId' => $cartId])
             ->with('success', __('Cart.cart_checked_out'));
     }
 
@@ -109,28 +109,18 @@ class CartController extends Controller
     /**
      * @throws Exception
      */
-    public function checkout(string $cartId): RedirectResponse
+    public function checkout(string $cartId): View
     {
         $this->checkoutCartUseCase->execute($cartId);
 
-        return redirect()->route('cart.thank-you');
-    }
+        $cart = $this->cartRepository->findByIdOrFail(UuidVO::fromString($cartId));
 
-    public function index(): View
-    {
-        $carts = $this->cartRepository->findAll();
-
-        return view('cart.index', compact('carts'));
+        return view('cart.thank-you', compact('cart'));
     }
 
     public function show(string $cartId): View
     {
         $cart = $this->cartRepository->findByIdOrFail(UuidVO::fromString($cartId));
         return view('cart.show', compact('cart'));
-    }
-
-    public function thankYou(): View
-    {
-        return view('cart.thank-you');
     }
 }
