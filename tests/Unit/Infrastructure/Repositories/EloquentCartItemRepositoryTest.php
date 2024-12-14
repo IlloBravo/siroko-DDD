@@ -138,4 +138,55 @@ class EloquentCartItemRepositoryTest extends TestCase
         $deletedCartItem = DB::table('cart_items')->where('id', $cartItemId)->first();
         $this->assertNull($deletedCartItem);
     }
+
+    public function testSaveInsertsOrUpdatesCartItem(): void
+    {
+        $cartId = UuidVO::generate()->__toString();
+        $productId = UuidVO::generate()->__toString();
+        $cartItemId = UuidVO::generate()->__toString();
+
+        DB::table('carts')->insert(['id' => $cartId, 'items' => json_encode([])]);
+        DB::table('products')->insert([
+            'id' => $productId,
+            'name' => 'Bike',
+            'price' => 1500.00,
+            'stock' => 10,
+        ]);
+
+        $cartItemData = (object) [
+            'id' => $cartItemId,
+            'cart_id' => $cartId,
+            'product_id' => $productId,
+            'quantity' => 3,
+        ];
+
+        $cartItem = CartItem::fromDatabase($cartItemData);
+
+        $repository = new EloquentCartItemRepository();
+
+        $repository->save($cartItem);
+
+        $retrieved = DB::table('cart_items')->where('id', $cartItemId)->first();
+        $this->assertNotNull($retrieved);
+        $this->assertEquals($cartId, $retrieved->cart_id);
+        $this->assertEquals($productId, $retrieved->product_id);
+        $this->assertEquals(3, $retrieved->quantity);
+
+        $updatedCartItemData = (object) [
+            'id' => $cartItemId,
+            'cart_id' => $cartId,
+            'product_id' => $productId,
+            'quantity' => 5,
+        ];
+
+        $updatedCartItem = CartItem::fromDatabase($updatedCartItemData);
+
+        $repository->save($updatedCartItem);
+
+        $updated = DB::table('cart_items')->where('id', $cartItemId)->first();
+        $this->assertNotNull($updated);
+        $this->assertEquals(5, $updated->quantity); // Nueva cantidad
+        $this->assertEquals($cartId, $updated->cart_id);
+        $this->assertEquals($productId, $updated->product_id);
+    }
 }
