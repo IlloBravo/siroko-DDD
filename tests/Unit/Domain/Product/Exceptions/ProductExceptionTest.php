@@ -4,40 +4,57 @@ namespace Tests\Unit\Domain\Product\Exceptions;
 
 use App\Domain\Product\Exceptions\InsufficientStockException;
 use App\Domain\Product\Exceptions\ProductNotFoundException;
+use App\Domain\Product\Product;
+use App\Domain\Shared\ValueObjects\UuidVO;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Support\Facades\Lang;
 
 class ProductExceptionTest extends TestCase
 {
-    public function testInsufficientStockException()
+    private Product $product;
+
+    protected function setUp(): void
     {
-        // Mock para el lenguaje, aseguramos que el mensaje se recupere de Lang correctamente
-        Lang::shouldReceive('get')
-            ->once()
-            ->with('Product.insufficient_stock', ['id' => '123e4567-e89b-12d3-a456-426614174001'])
-            ->andReturn('No hay suficiente stock para el producto con ID 123e4567-e89b-12d3-a456-426614174001');
+        parent::setUp();
 
-        // Probar que la excepción se lanza correctamente
-        $this->expectException(InsufficientStockException::class);
-        $this->expectExceptionMessage('No hay suficiente stock para el producto con ID 123e4567-e89b-12d3-a456-426614174001');
+        $productData = (object) [
+            'id' => UuidVO::generate()->__toString(),
+            'name' => 'Laptop',
+            'price' => 1500.00,
+            'stock' => 10,
+        ];
 
-        // Lanzar la excepción
-        throw new InsufficientStockException('123e4567-e89b-12d3-a456-426614174001');
+        $this->product = Product::fromDatabase($productData);
     }
 
-    public function testProductNotFoundException()
+    public function testInsufficientStockException(): void
     {
-        // Mock para el lenguaje, aseguramos que el mensaje se recupere de Lang correctamente
         Lang::shouldReceive('get')
             ->once()
-            ->with('Product.product_not_found', ['id' => '123e4567-e89b-12d3-a456-426614174001'])
-            ->andReturn('Producto con ID 123e4567-e89b-12d3-a456-426614174001 no encontrado');
+            ->with('Product.insufficient_stock', [
+                'name' => $this->product->name,
+                'stock' => $this->product->stock,
+            ])
+            ->andReturn("No hay suficiente stock para el producto '{$this->product->name}'. Stock actual: {$this->product->stock}");
 
-        // Probar que la excepción se lanza correctamente
+        $this->expectException(InsufficientStockException::class);
+        $this->expectExceptionMessage("No hay suficiente stock para el producto '{$this->product->name}'. Stock actual: {$this->product->stock}");
+
+        throw new InsufficientStockException($this->product->name, $this->product->stock);
+    }
+
+    public function testProductNotFoundException(): void
+    {
+        $productId = $this->product->id->__toString();
+
+        Lang::shouldReceive('get')
+            ->once()
+            ->with('Product.product_not_found', ['id' => $productId])
+            ->andReturn("Producto con ID $productId no encontrado");
+
         $this->expectException(ProductNotFoundException::class);
-        $this->expectExceptionMessage('Producto con ID 123e4567-e89b-12d3-a456-426614174001 no encontrado');
+        $this->expectExceptionMessage("Producto con ID $productId no encontrado");
 
-        // Lanzar la excepción
-        throw new ProductNotFoundException('123e4567-e89b-12d3-a456-426614174001');
+        throw new ProductNotFoundException($productId);
     }
 }
