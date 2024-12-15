@@ -6,10 +6,10 @@ Este repositorio implementa una API de carrito de compras siguiendo los principi
 
 ### Requisitos Previos
 
-- **PHP** (>= 8.1)
+- **PHP** (>= 8.2)
 - **Composer** (gestor de dependencias de PHP)
 - **SQLite** (base de datos para pruebas locales)
-- **Laravel** (>= 9.x)
+- **Laravel** (11)
 
 ### Instalación Automática
 
@@ -23,16 +23,14 @@ El script se encargará de:
 
 1. Instalar dependencias con `composer install`.
 2. Configurar la base de datos SQLite.
-3. Ejecutar las migraciones y seeders para poblar la base de datos.
-4. Generar la clave de aplicación de Laravel.
+3. Generar la clave de aplicación de Laravel.
+4. Ejecutar las migraciones y seeders para poblar la base de datos.
+5. Ejecutar las migraciones y seeders para el entorno de tests
+6. Lanza los tests
 
 Por defecto, el servidor se ejecutará en `http://127.0.0.1:8000`.
 
 Accede a la ruta principal para ver los productos disponibles:
-
-```
-http://127.0.0.1:8000/all-products-available
-```
 
 ## Funcionalidades Implementadas
 
@@ -43,27 +41,37 @@ http://127.0.0.1:8000/all-products-available
    GET /all-products-available
    ```
 
-2. **Ver todos los carritos creados:**
+2. **Ver tu carrito:**
    ```
-   GET /all-carts-created
+   GET /{cartId}/cart/view
    ```
-
-3. **Añadir productos al carrito:**
+   
+3. **Página de Gracias:**
    ```
-   POST /cart/{cartId}/add-product
-   ```
-
-4. **Actualizar cantidad de un producto en el carrito:**
-   ```
-   PUT /cart/{cartId}/update-product/{productId}
+   GET /{cartId}/thank-you
    ```
 
-5. **Eliminar producto del carrito:**
+4. **Añadir productos al carrito:**
    ```
-   DELETE /cart/{cartId}/remove-product/{productId}
+   POST /cart/{cartId}/add-cart-item
    ```
 
-6. **Finalizar compra del carrito:**
+5. **Actualizar cantidad de un producto en el carrito:**
+   ```
+   PUT /cart/{cartId}/update-cart
+   ```
+
+6. **Eliminar producto del carrito:**
+   ```
+   DELETE /cart/{cartId}/remove-cart-item/{cartItemId}
+   ```
+
+7. **Recuento de productos en el carrito:**
+   ```
+   POST /cart/{cartId}/cart-items/count
+   ```
+
+8. **Finalizar compra del carrito:**
    ```
    POST /cart/{cartId}/checkout
    ```
@@ -92,21 +100,22 @@ Asegúrate de que la base de datos de pruebas esté configurada en `.env.testing
 siroko-DDD/
 ├── app/
 │   ├── Application/        # Casos de uso
-│   ├── Domain/             # Entidades y repositorios
+│   ├── Domain/             # Entidades, repositorios y excepciones
 │   └── Http/               # Controladores
-│   └── Infrastructure/     # Repositorios Eloquent y adaptadores
+│   └── Infrastructure/     # Repositorios Eloquent
+│   └── Models/             # Modelo de las entidades
 ├── database/
 │   └── migrations/         # Migraciones de la base de datos
 │   └── seeders/            # Seeders necesarios para la prueba
+│   └── factories/          # Factorias necesarias para tests
 ├── resources/              # Vistas y traducciones necesarias para la prueba
 ├── routes/
 │   └── web.php             # Definición de rutas para las vistas
 │   └── api.php             # Definición de rutas para la API
-├── tests/
-│   └── Feature/            # Pruebas funcionales
+├── tests/                  # Pruebas funcionales
 ├── setup.sh                # Script de configuración automática
 └── README.md               # Documentación del proyecto
 ```
 
 **Desarrollado por:** David Bravo de Arce  
-**Fecha de entrega:** 12/12/2024
+**Fecha de entrega:** 16/12/2024
