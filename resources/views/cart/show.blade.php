@@ -5,7 +5,7 @@
 
     <div id="alert-container"></div>
 
-    <form id="update-cart-form" action="{{ route('api.cart.updateProduct', ['cartId' => $cart->id]) }}" method="POST">
+    <form id="update-cart-form" action="{{ route('api.cart.updateCart', ['cartId' => $cart->id]) }}" method="POST">
         @csrf
         @method('PUT')
 
@@ -18,14 +18,14 @@
             </tr>
             </thead>
             <tbody>
-            @foreach ($cart->items as $product)
+            @foreach ($cart->cartItems as $cartItem)
                 <tr>
-                    <td>{{ $product->name }}</td>
+                    <td>{{ $cartItem->product()->name }}</td>
                     <td>
-                        <input type="number" name="products[{{ $product->id }}][quantity]" value="{{ $product->cartQuantity }}" min="1" class="form-control w-50">
+                        <input type="number" name="products[{{ $cartItem->id }}][quantity]" value="{{ $cartItem->quantity }}" min="1" class="form-control w-50">
                     </td>
                     <td>
-                        <button type="button" class="btn btn-danger btn-sm delete-button" data-delete-url="{{ route('api.cart.removeProduct', ['cartId' => $cart->id, 'productId' => $product->id]) }}">
+                        <button type="button" class="btn btn-danger btn-sm delete-button" data-delete-url="{{ route('api.cart.removeCartItem', ['cartId' => $cart->id, 'cartItemId' => $cartItem->id]) }}">
                             {{ __('Cart.remove') }}
                         </button>
                     </td>
@@ -58,11 +58,20 @@
                             _token: '{{ csrf_token() }}'
                         },
                         success: function (response) {
-                            alert('Producto eliminado exitosamente.');
-                            location.reload();
+                            $('#alert-container').html('<div class="alert alert-success">' + response.message + '</div>');
+                            setTimeout(() => {
+                                $('#alert-container').fadeOut('slow', function () {
+                                    location.reload();
+                                });
+                            }, 3000);
                         },
-                        error: function () {
-                            alert('Error al eliminar el producto.');
+                        error: function (xhr) {
+                            $('#alert-container').html('<div class="alert alert-danger">' + xhr.responseJSON.error + '</div>');
+                            setTimeout(() => {
+                                $('#alert-container').fadeOut('slow', function () {
+                                    location.reload();
+                            });
+                            }, 3000);
                         }
                     });
                 }
@@ -76,13 +85,17 @@
                     data: $(this).serialize(),
                     success: function (response) {
                         $('#alert-container').html('<div class="alert alert-success">' + response.message + '</div>');
+                        setTimeout(() => {
+                            $('#alert-container').fadeOut('slow');
+                        }, 3000);
                     },
                     error: function (xhr) {
-                        if (xhr.responseJSON && xhr.responseJSON.error) {
-                            $('#alert-container').html('<div class="alert alert-danger">' + xhr.responseJSON.error + '</div>');
-                        } else {
-                            $('#alert-container').html('<div class="alert alert-danger">Error al actualizar el carrito.</div>');
-                        }
+                        $('#alert-container').html('<div class="alert alert-danger">' + xhr.responseJSON.error + '</div>');
+                        setTimeout(() => {
+                            $('#alert-container').fadeOut('slow', function () {
+                                location.reload();
+                        });
+                        }, 3000);
                     }
                 });
             });

@@ -19,7 +19,13 @@ if [ ! -f .env ]; then
 fi
 
 echo "⚙️ Ejecutando migraciones y seeders..."
-php artisan migrate && php artisan db:seed
+php artisan migrate:fresh && php artisan db:seed
+
+echo "⚙️ Ejecutando migraciones y seeders para el entorno de test"
+php artisan migrate:fresh && php artisan db:seed --env=testing
+
+echo "⚙️ Ejecutando tests"
+php artisan test
 
 echo "🌐 Iniciando el servidor de desarrollo en http://127.0.0.1:8000..."
 php artisan serve

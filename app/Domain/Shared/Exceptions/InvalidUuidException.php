@@ -5,7 +5,7 @@ namespace App\Domain\Shared\Exceptions;
 use Illuminate\Support\Facades\Lang;
 use InvalidArgumentException;
 
-class InvalidUuidException extends InvalidArgumentException
+final class InvalidUuidException extends InvalidArgumentException
 {
     public function __construct(string $value)
     {

@@ -3,43 +3,18 @@
 namespace App\Infrastructure\Repositories;
 
 use App\Domain\Cart\Cart;
+use App\Domain\Cart\CartItem;
 use App\Domain\Cart\Exceptions\CartNotFoundException;
 use App\Domain\Cart\Repository\CartRepositoryInterface;
-use App\Domain\Product\Product;
 use App\Domain\Shared\ValueObjects\UuidVO;
-use DateMalformedStringException;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 class EloquentCartRepository implements CartRepositoryInterface
 {
-    public function save(Cart $cart): void
-    {
-        DB::table('carts')->updateOrInsert(
-            ['id' => (string) $cart->id],
-            [
-                'items' => json_encode($cart->items->map(function (Product $item) {
-                    return [
-                        'id' => (string) $item->id,
-                        'name' => $item->name,
-                        'price' => $item->price,
-                        'quantity' => $item->quantity,
-                        'cartQuantity' => $item->cartQuantity
-                    ];
-                })->values()->all()),
-                'created_at' => $cart->createdAt,
-                'updated_at' => $cart->updatedAt,
-            ]
-        );
-    }
-
-    /**
-     * @throws DateMalformedStringException
-     */
     public function findByIdOrFail(UuidVO $id): Cart
     {
-        $uuid = UuidVO::fromString($id);
-
-        $cartData = DB::table('carts')->where('id', $uuid)->first();
+        $cartData = DB::table('carts')->where('id', (string) $id)->first();
 
         if (!$cartData) {
             throw new CartNotFoundException($id);
@@ -48,17 +23,29 @@ class EloquentCartRepository implements CartRepositoryInterface
         return Cart::fromDatabase($cartData);
     }
 
-    public function delete(string $id): void
-    {
-        DB::table('carts')->where('id', $id)->delete();
-    }
-
-    public function findAll(): array
+    public function findAll(): Collection
     {
         $cartsData = DB::table('carts')->get();
 
         return $cartsData->map(function ($cartData) {
-            return Cart::fromDatabase((object) $cartData);
+            return Cart::fromDatabase($cartData);
+        });
+    }
+
+    public function save(Cart $cart): void
+    {
+        $cartItemsData = $cart->getCartItems()->map(function (CartItem $item) {
+            return [
+                'id' => (string) $item->id,
+                'cart_id' => (string) $item->cartId,
+                'product_id' => (string) $item->productId,
+                'quantity' => $item->quantity,
+            ];
         })->toArray();
+
+        DB::table('carts')->updateOrInsert(
+            ['id' => (string) $cart->id],
+            ['items' => json_encode($cartItemsData)]
+        );
     }
 }

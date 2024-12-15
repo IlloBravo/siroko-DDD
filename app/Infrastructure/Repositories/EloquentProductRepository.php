@@ -6,6 +6,7 @@ use App\Domain\Product\Exceptions\ProductNotFoundException;
 use App\Domain\Product\Product;
 use App\Domain\Product\Repository\ProductRepositoryInterface;
 use App\Domain\Shared\ValueObjects\UuidVO;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 class EloquentProductRepository implements ProductRepositoryInterface
@@ -21,39 +22,25 @@ class EloquentProductRepository implements ProductRepositoryInterface
         return Product::fromDatabase($productData);
     }
 
-    public function updateStock(UuidVO $productId, int $quantity): void
-    {
-        DB::table('products')
-            ->where('id', (string) $productId)
-            ->decrement('quantity', $quantity);
-    }
-
-    public function increaseStock(UuidVO $productId, int $quantity): void
-    {
-        DB::table('products')
-            ->where('id', (string) $productId)
-            ->increment('quantity', $quantity);
-    }
-
-    public function findAll(): array
+    public function findAll(): Collection
     {
         $productsData = DB::table('products')->get();
 
         return $productsData->map(function ($productData) {
             return Product::fromDatabase($productData);
-        })->toArray();
+        });
     }
 
     public function save(Product $product): void
     {
         DB::table('products')
-            ->where('id', (string) $product->id)
-            ->update([
-                'name' => $product->name,
-                'price' => $product->price,
-                'quantity' => $product->quantity,
-                'cartQuantity' => $product->cartQuantity,
-                'updated_at' => now(),
-            ]);
+            ->updateOrInsert(
+                ['id' => (string) $product->id],
+                [
+                    'name' => $product->name,
+                    'price' => $product->price,
+                    'stock' => $product->stock,
+                ]
+            );
     }
 }

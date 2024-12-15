@@ -22,7 +22,7 @@
                         <a class="nav-link" href="{{ route('products.index') }}">{{ __('Cart.all_products') }}</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('cart.index') }}">{{ __('Cart.all_carts') }}</a>
+                        <a class="nav-link" href="{{ route('cart.show', ['cartId' => $cart->id]) }}">{{ __('Cart.your_cart') }}</a>
                     </li>
                 </ul>
             </div>

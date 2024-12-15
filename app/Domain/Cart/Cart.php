@@ -2,131 +2,73 @@
 
 namespace App\Domain\Cart;
 
-use App\Domain\Product\Product;
 use App\Domain\Shared\ValueObjects\UuidVO;
-use DateMalformedStringException;
-use DateTime;
 use Illuminate\Support\Collection;
 
 final class Cart
 {
     public function __construct(
-        public UuidVO $id,
-        public Collection $items,
-        public DateTime $createdAt,
-        public DateTime $updatedAt
+        public UuidVO     $id,
+        public Collection $cartItems
     ) {}
 
-    /**
-     * @throws DateMalformedStringException
-     */
-    public static function create(array $data): self
-    {
-        return new self(
-            UuidVO::fromString($data['id']),
-            collect(json_decode($data['items'], true))->map(
-                fn($item) => Product::fromDatabase((object) $item)
-            ),
-            new DateTime($data['created_at']),
-            new DateTime($data['updated_at'])
-        );
-    }
-
-    /**
-     * @throws DateMalformedStringException
-     */
     public static function fromDatabase(object $data): self
     {
+        $cartItems = collect(json_decode($data->items, true))->map(function ($item) {
+            return new CartItem(
+                UuidVO::fromString($item['id']),
+                UuidVO::fromString($item['cart_id']),
+                UuidVO::fromString($item['product_id']),
+                $item['quantity']
+            );
+        });
+
         return new self(
             UuidVO::fromString($data->id),
-            collect(json_decode($data->items, true))->map(
-                fn($item) => Product::fromDatabase((object) $item)
-            ),
-            new DateTime($data->created_at),
-            new DateTime($data->updated_at)
+            $cartItems
         );
     }
 
-    public function addProduct(Product $product, int $quantity): void
+    public function addCartItem(CartItem $newCartItem, int $quantity): void
     {
-        $product->decreaseStock($quantity);
+        $existingCartItem = $this->cartItems
+            ->first(fn(CartItem $item) => $item->productId->equals($newCartItem->productId));
 
-        $existingItem = $this->items->first(fn(Product $item) => $item->id->equals($product->id));
-        if ($existingItem) {
-            $existingItem->cartQuantity += $quantity;
+        if ($existingCartItem) {
+            $existingCartItem->quantity += $quantity;
         } else {
-            $product->cartQuantity = $quantity;
-            $this->items->push($product);
+            $this->cartItems->push($newCartItem);
         }
-
-        $this->updatedAt = new DateTime();
     }
 
-    public function updateProductQuantity(UuidVO $productId, int $newQuantity): void
+    public function updateCartItemQuantity(CartItem $cartItemId, int $newQuantity): void
     {
-        $this->items->each(function (Product $item) use ($productId, $newQuantity) {
-            if ($item->id->equals($productId)) {
-                $difference = $newQuantity - $item->cartQuantity;
+        $cartItem = $this->cartItems
+            ->first(fn(CartItem $item) => $item->id->equals($cartItemId->id));
 
-                if ($difference > 0) {
-                    $item->decreaseStock($difference);
-                } elseif ($difference < 0) {
-                    $item->increaseStock(abs($difference));
-                }
-
-                $item->cartQuantity = $newQuantity;
-            }
-        });
-
-        $this->updatedAt = new DateTime();
+        $cartItem->quantity = $newQuantity;
     }
 
-    public function removeProduct(UuidVO $productId): void
+    public function removeCartItem(UuidVO $cartItemId): void
     {
-        $this->items = $this->items->reject(function (Product $item) use ($productId) {
-            if ($item->id->equals($productId)) {
-                $item->increaseStock($item->cartQuantity);
-                return true;
-            }
-            return false;
-        });
-
-        $this->updatedAt = new DateTime();
-    }
-
-    public function getTotalProducts(): int
-    {
-        return $this->items->sum(fn(Product $item) => $item->cartQuantity);
+        $this->cartItems = $this->cartItems
+            ->reject(fn(CartItem $item) => $item->id->equals($cartItemId));
     }
 
     public function checkout(): void
     {
-        $this->items = collect();
-        $this->updatedAt = new DateTime();
+        $this->cartItems = collect();
     }
 
-    public function getProductStock(UuidVO $productId): int
+    public function getCartItems(): Collection
     {
-        $product = $this->getProduct($productId);
-
-        if (!$product) {
-            return 0;
-        }
-
-        return $product->quantity + $product->cartQuantity;
+        return $this->cartItems;
     }
 
-    public function getProduct(UuidVO $productId): ?Product
+    public function total(): float
     {
-        return $this->items->first(fn(Product $item) => $item->id->equals($productId));
-    }
-
-    public function getProductQuantity(UuidVO $productId): int
-    {
-        $product = $this->items
-            ->filter(fn(Product $item) => $item->id->equals($productId))
-            ->first();
-
-        return $product ? $product->cartQuantity : 0;
+        return $this->cartItems->sum(
+            fn(CartItem $item) => $item->product()->price * $item->quantity
+        );
     }
 }

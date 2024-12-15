@@ -2,8 +2,12 @@
 
 namespace App\Application\Cart\UseCases;
 
+use App\Domain\Cart\CartItem;
+use App\Domain\Cart\Exceptions\CartItemNotFoundException;
 use App\Domain\Cart\Exceptions\CartNotFoundException;
+use App\Domain\Cart\Repository\CartItemRepositoryInterface;
 use App\Domain\Cart\Repository\CartRepositoryInterface;
+use App\Domain\Product\Exceptions\ProductNotFoundException;
 use App\Domain\Product\Repository\ProductRepositoryInterface;
 use App\Domain\Shared\ValueObjects\UuidVO;
 
@@ -11,21 +15,33 @@ readonly class RemoveProductFromCartUseCase
 {
     public function __construct(
         private CartRepositoryInterface $cartRepository,
-        private ProductRepositoryInterface $productRepository
+        private ProductRepositoryInterface $productRepository,
+        private CartItemRepositoryInterface $cartItemRepository
     ) {}
 
     /**
      * @throws CartNotFoundException
+     * @throws CartItemNotFoundException
+     * @throws ProductNotFoundException
      */
-    public function execute(string $cartId, string $productId): void
+    public function execute(string $cartId, string $cartItemId): void
     {
-        $uuidProduct = UuidVO::fromString($productId);
         $cart = $this->cartRepository->findByIdOrFail(UuidVO::fromString($cartId));
 
-        $quantityRemoved = $cart->getProductQuantity($uuidProduct);
-        $cart->removeProduct($uuidProduct);
+        $cartItem = $cart->getCartItems()->first(
+            fn (CartItem $item) => $item->id->equals(UuidVO::fromString($cartItemId))
+        );
+
+        $product = $this->productRepository->findByIdOrFail($cartItem->productId);
+
+        $product->increaseStock($cartItem->quantity);
+
+        $cart->removeCartItem($cartItem->id);
+
         $this->cartRepository->save($cart);
 
-        $this->productRepository->increaseStock($uuidProduct, $quantityRemoved);
+        $this->productRepository->save($product);
+        $this->cartItemRepository->delete($cartItem->id);
     }
+
 }

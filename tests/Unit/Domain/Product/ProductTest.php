@@ -2,77 +2,69 @@
 
 namespace Tests\Unit\Domain\Product;
 
+use App\Domain\Product\Exceptions\InsufficientStockException;
 use App\Domain\Product\Product;
+use App\Domain\Shared\ValueObjects\UuidVO;
 use PHPUnit\Framework\TestCase;
 
 class ProductTest extends TestCase
 {
-    public function testCreateProduct()
+    private Product $product;
+    private UuidVO $productId;
+
+    protected function setUp(): void
     {
-        $productData = (object)[
-            'id' => '123e4567-e89b-12d3-a456-426614174001',
-            'name' => 'Producto A',
-            'price' => 10.5,
-            'quantity' => 100,
-            'cartQuantity' => 0,
+        parent::setUp();
+
+        $this->productId = UuidVO::generate();
+
+        $productData = (object) [
+            'id' => $this->productId->__toString(),
+            'name' => 'Laptop',
+            'price' => 1500.00,
+            'stock' => 10,
         ];
 
-        $product = Product::fromDatabase($productData);
-
-        $this->assertEquals('123e4567-e89b-12d3-a456-426614174001', $product->id->__toString());
-        $this->assertEquals('Producto A', $product->name);
-        $this->assertEquals(10.5, $product->price);
-        $this->assertEquals(100, $product->quantity);
-        $this->assertEquals(0, $product->cartQuantity);
+        $this->product = Product::fromDatabase($productData);
     }
 
-    public function testDecreaseStock()
+    public function testProductCanBeCreatedFromDatabase(): void
     {
-        $productData = (object)[
-            'id' => '123e4567-e89b-12d3-a456-426614174001',
-            'name' => 'Producto A',
-            'price' => 10.5,
-            'quantity' => 100,
-            'cartQuantity' => 0,
-        ];
-
-        $product = Product::fromDatabase($productData);
-
-        $product->decreaseStock(10);
-
-        $this->assertEquals(90, $product->quantity);
+        $this->assertInstanceOf(Product::class, $this->product);
+        $this->assertEquals($this->productId->__toString(), $this->product->id->__toString());
+        $this->assertEquals('Laptop', $this->product->name);
+        $this->assertEquals(1500.00, $this->product->price);
+        $this->assertEquals(10, $this->product->stock);
     }
 
-    public function testIncreaseStock()
+    public function testProductHasSufficientStock(): void
     {
-        $productData = (object)[
-            'id' => '123e4567-e89b-12d3-a456-426614174001',
-            'name' => 'Producto A',
-            'price' => 10.5,
-            'quantity' => 100,
-            'cartQuantity' => 0,
-        ];
-
-        $product = Product::fromDatabase($productData);
-
-        $product->increaseStock(15);
-
-        $this->assertEquals(115, $product->quantity);
+        $this->assertTrue($this->product->hasSufficientStock(5));
+        $this->assertFalse($this->product->hasSufficientStock(15));
     }
 
-    public function testFromDatabase()
+    public function testDecreaseStock(): void
     {
-        $productData = (object)[
-            'id' => '123e4567-e89b-12d3-a456-426614174001',
-            'name' => 'Producto A',
-            'price' => 10.5,
-            'quantity' => 100,
-            'cartQuantity' => 10,
-        ];
+        $this->product->decreaseStock(3);
+        $this->assertEquals(7, $this->product->stock);
+    }
 
-        $product = Product::fromDatabase($productData);
+    public function testIncreaseStock(): void
+    {
+        $this->product->increaseStock(5);
+        $this->assertEquals(15, $this->product->stock);
+    }
 
-        $this->assertInstanceOf(Product::class, $product);
-        $this->assertEquals(10, $product->cartQuantity);
+    public function testDecreaseStockToZero(): void
+    {
+        $this->product->decreaseStock(10);
+        $this->assertEquals(0, $this->product->stock);
+    }
+
+    public function testDecreaseStockThrowsExceptionWhenInsufficient(): void
+    {
+        $this->expectException(InsufficientStockException::class);
+
+        $this->product->decreaseStock(15);
     }
 }
