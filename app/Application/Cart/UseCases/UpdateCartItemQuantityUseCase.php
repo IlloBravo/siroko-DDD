@@ -25,10 +25,6 @@ readonly class UpdateCartItemQuantityUseCase
      */
     public function execute(string $cartId, string $cartItemId, int $newQuantity): void
     {
-        if ($newQuantity <= 0) {
-            throw new InvalidQuantityException($newQuantity);
-        }
-
         $cart = $this->cartRepository->findByIdOrFail(UuidVO::fromString($cartId));
         $cartItem = $cart->cartItems
             ->first(fn(CartItem $item) => $item->id->equals(UuidVO::fromString($cartItemId)));
