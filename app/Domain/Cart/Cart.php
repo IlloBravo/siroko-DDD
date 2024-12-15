@@ -17,8 +17,8 @@ final class Cart
         $cartItems = collect(json_decode($data->items, true))->map(function ($item) {
             return new CartItem(
                 UuidVO::fromString($item['id']),
-                UuidVO::fromString($item['cartId']),
-                UuidVO::fromString($item['productId']),
+                UuidVO::fromString($item['cart_id']),
+                UuidVO::fromString($item['product_id']),
                 $item['quantity']
             );
         });

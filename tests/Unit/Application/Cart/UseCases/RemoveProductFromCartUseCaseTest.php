@@ -4,62 +4,80 @@ namespace Tests\Unit\Application\Cart\UseCases;
 
 use App\Application\Cart\UseCases\RemoveProductFromCartUseCase;
 use App\Domain\Cart\Cart;
-use App\Domain\Cart\Exceptions\CartNotFoundException;
-use App\Domain\Cart\Repository\CartRepositoryInterface;
-use App\Domain\Product\Product;
-use App\Domain\Product\Repository\ProductRepositoryInterface;
+use App\Domain\Cart\CartItem;
 use App\Domain\Shared\ValueObjects\UuidVO;
-use DateMalformedStringException;
-use PHPUnit\Framework\MockObject\Exception;
-use PHPUnit\Framework\TestCase;
-use Ramsey\Uuid\Uuid;
+use Illuminate\Support\Facades\DB;
+use Tests\TestCase;
+use Tests\Traits\RepositoryMockTrait;
 
 class RemoveProductFromCartUseCaseTest extends TestCase
 {
-    /**
-     * @throws DateMalformedStringException
-     * @throws Exception
-     */
+    use RepositoryMockTrait;
     public function testExecute(): void
     {
-        $cartId = Uuid::uuid4()->toString();
-        $productId = Uuid::uuid4()->toString();
+        // Configuramos los datos del carrito, producto, y item del carrito
+        $cartData = (object) [
+            'id' => UuidVO::generate()->__toString(),
+            'items' => json_encode([]), // Inicialmente vacío
+        ];
 
-        $cart = Cart::create([
-            'id' => Uuid::uuid4(),
-            'items' => json_encode([]),
-            'created_at' => now(),
-            'updated_at' => now(),
+        $productData = (object) [
+            'id' => UuidVO::generate()->__toString(),
+            'name' => 'Bike',
+            'price' => 1500.00,
+            'stock' => 10,
+        ];
+
+        $cartItemData = (object) [
+            'id' => UuidVO::generate()->__toString(),
+            'cart_id' => $cartData->id,
+            'product_id' => $productData->id,
+            'quantity' => 3,
+        ];
+
+        // Insertamos los datos necesarios en la base de datos para cumplir restricciones de claves foráneas
+        DB::table('carts')->insert([
+            'id' => $cartData->id,
+            'items' => $cartData->items,
         ]);
 
-        $product = Product::fromDatabase((object)[
-            'id' => $productId,
-            'name' => 'Producto de Prueba',
-            'price' => 20.0,
-            'quantity' => 10,
-            'cartQuantity' => 0,
+        DB::table('products')->insert([
+            'id' => $productData->id,
+            'name' => $productData->name,
+            'price' => $productData->price,
+            'stock' => $productData->stock,
         ]);
-        $cart->addProduct($product, 3);
 
-        $mockCartRepository = $this->createMock(CartRepositoryInterface::class);
-        $mockCartRepository->expects($this->once())
-            ->method('findByIdOrFail')
-            ->with($this->callback(function ($uuid) use ($cartId) {
-                return $uuid->__toString() === $cartId;
-            }))
-            ->willReturn($cart);
-        $mockCartRepository->expects($this->once())->method('save')->with($cart);
+        DB::table('cart_items')->insert([
+            'id' => $cartItemData->id,
+            'cart_id' => $cartItemData->cart_id,
+            'product_id' => $cartItemData->product_id,
+            'quantity' => $cartItemData->quantity,
+        ]);
 
-        $mockProductRepository = $this->createMock(ProductRepositoryInterface::class);
-        $mockProductRepository->expects($this->once())
-            ->method('increaseStock')
-            ->with($this->callback(function ($uuid) use ($productId) {
-                return $uuid->__toString() === $productId;
-            }), 3);
+        DB::table('carts')
+            ->where('id', $cartData->id)
+            ->update([
+                'items' => json_encode([
+                    [
+                        'id' => $cartItemData->id,
+                        'cart_id' => $cartData->id,
+                        'product_id' => $productData->id,
+                        'quantity' => 3,
+                    ],
+                ]),
+            ]);
 
-        $useCase = new RemoveProductFromCartUseCase($mockCartRepository, $mockProductRepository);
-        $useCase->execute($cartId, $productId);
+        // Creamos la entidad de Cart desde la base de datos
+        $cart = Cart::fromDatabase($cartData);
 
-        $this->assertEquals(0, $cart->getProductQuantity(UuidVO::fromString($productId)));
+        $cartItem = CartItem::fromDatabase($cartItemData);
+
+        // Ejecutamos el caso de uso
+        $useCase = app(RemoveProductFromCartUseCase::class);
+        $useCase->execute($cart->id, $cartItem->id);
+
+        // Verificamos que se ha eliminado el ítem del carrito
+        $this->assertCount(0, $cart->getCartItems());
     }
 }

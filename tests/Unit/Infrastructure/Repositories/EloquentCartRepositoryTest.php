@@ -84,34 +84,47 @@ class EloquentCartRepositoryTest extends TestCase
 
     public function testSaveSuccessfullyUpdatesCart(): void
     {
-        $productData = (object) [
-            'id' => UuidVO::generate()->__toString(),
+        $product_id = UuidVO::generate()->__toString();
+        DB::table('products')->insert([
+            'id' => $product_id,
             'name' => 'Bike',
             'price' => 1500.00,
             'stock' => 10,
-        ];
+        ]);
 
-        $product = Product::fromDatabase($productData);
-        $cartId = UuidVO::generate();
+        $cart_id = UuidVO::generate()->__toString();
+        DB::table('carts')->insert([
+            'id' => $cart_id,
+            'items' => json_encode([]),
+        ]);
 
-        $cartItemData = (object) [
-            'id' => UuidVO::generate()->__toString(),
-            'cartId' => $cartId->__toString(),
-            'productId' => $product->id->__toString(),
-            'quantity' => 1,
-        ];
+        $cart_item_id = UuidVO::generate()->__toString();
+        DB::table('cart_items')->insert([
+            'id' => $cart_item_id,
+            'cart_id' => $cart_id,
+            'product_id' => $product_id,
+            'quantity' => 3,
+        ]);
 
+        DB::table('carts')
+            ->where('id', $cart_id)
+            ->update([
+                'items' => json_encode([
+                    [
+                        'id' => $cart_item_id,
+                        'cart_id' => $cart_id,
+                        'product_id' => $product_id,
+                        'quantity' => 3,
+                    ],
+                ]),
+            ]);
 
-        $cartData = (object)[
-            'id' => $cartId,
-            'items' => json_encode([$cartItemData]),
-        ];
-
-        $cart = Cart::fromDatabase($cartData);
+        $cartRow = DB::table('carts')->where('id', $cart_id)->first();
+        $cart = Cart::fromDatabase($cartRow);
 
         $repository = new EloquentCartRepository();
         $repository->save($cart);
         $retrievedCart = $repository->findByIdOrFail($cart->id);
-        $this->assertEquals(1, $retrievedCart->getCartItems()->first()->quantity);
+        $this->assertEquals(3, $retrievedCart->getCartItems()->first()->quantity);
     }
 }

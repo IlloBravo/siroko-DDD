@@ -32,10 +32,6 @@ readonly class RemoveProductFromCartUseCase
             fn (CartItem $item) => $item->id->equals(UuidVO::fromString($cartItemId))
         );
 
-        if (!$cartItem) {
-            throw new CartItemNotFoundException($cartItemId);
-        }
-
         $product = $this->productRepository->findByIdOrFail($cartItem->productId);
 
         $product->increaseStock($cartItem->quantity);

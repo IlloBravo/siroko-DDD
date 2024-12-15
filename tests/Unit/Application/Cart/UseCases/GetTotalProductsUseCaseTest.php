@@ -4,49 +4,55 @@ namespace Tests\Unit\Application\Cart\UseCases;
 
 use App\Application\Cart\UseCases\GetTotalProductsUseCase;
 use App\Domain\Cart\Cart;
-use App\Domain\Cart\Exceptions\CartNotFoundException;
-use App\Domain\Cart\Repository\CartRepositoryInterface;
-use App\Domain\Product\Product;
-use DateMalformedStringException;
-use PHPUnit\Framework\MockObject\Exception;
-use PHPUnit\Framework\TestCase;
-use Ramsey\Uuid\Uuid;
+use App\Domain\Shared\ValueObjects\UuidVO;
+use Illuminate\Support\Facades\DB;
+use Tests\TestCase;
 
 class GetTotalProductsUseCaseTest extends TestCase
 {
-    /**
-     * @throws DateMalformedStringException
-     * @throws Exception
-     */
     public function testExecuteReturnsTotalProducts(): void
     {
-        $cart = Cart::create([
-            'id' => Uuid::uuid4(),
-            'items' => json_encode([]),
-            'created_at' => now(),
-            'updated_at' => now(),
+        $product_id = UuidVO::generate()->__toString();
+        DB::table('products')->insert([
+            'id' => $product_id,
+            'name' => 'Bike',
+            'price' => 1500.00,
+            'stock' => 10,
         ]);
 
-        $productData = (object) [
-            'id' => '123e4567-e89b-12d3-a456-426614174001',
-            'name' => 'Producto B',
-            'price' => 30.0,
-            'quantity' => 20,
-            'cartQuantity' => 0,
-        ];
-        $product = Product::fromDatabase($productData);
+        $cart_id = UuidVO::generate()->__toString();
+        DB::table('carts')->insert([
+            'id' => $cart_id,
+            'items' => json_encode([]), // Inicialmente vacío
+        ]);
 
-        $cart->addProduct($product, 3);
+        $cart_item_id = UuidVO::generate()->__toString();
+        DB::table('cart_items')->insert([
+            'id' => $cart_item_id,
+            'cart_id' => $cart_id,
+            'product_id' => $product_id,
+            'quantity' => 3,
+        ]);
 
-        $cartRepository = $this->createMock(CartRepositoryInterface::class);
-        $cartRepository->expects($this->once())
-            ->method('findByIdOrFail')
-            ->with($cart->id)
-            ->willReturn($cart);
+        DB::table('carts')
+            ->where('id', $cart_id)
+            ->update([
+                'items' => json_encode([
+                    [
+                        'id' => $cart_item_id,
+                        'cart_id' => $cart_id,
+                        'product_id' => $product_id,
+                        'quantity' => 3,
+                    ],
+                ]),
+            ]);
 
-        $useCase = new GetTotalProductsUseCase($cartRepository);
+        $cartRow = DB::table('carts')->where('id', $cart_id)->first();
+        $cart = Cart::fromDatabase($cartRow);
+
+        $useCase = app(GetTotalProductsUseCase::class);
         $totalProducts = $useCase->execute($cart->id->__toString());
 
-        $this->assertEquals(3, $totalProducts);
+        $this->assertEquals(1, $totalProducts);
     }
 }

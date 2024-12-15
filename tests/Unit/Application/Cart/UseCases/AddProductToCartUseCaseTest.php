@@ -27,8 +27,8 @@ class AddProductToCartUseCaseTest extends TestCase
 
         $cartItemData = (object) [
             'id' => UuidVO::generate()->__toString(),
-            'cart' => $cartData,
-            'product' => $productData,
+            'cart_id' => $cartData->id,
+            'product_id' => $productData->id,
             'quantity' => 3,
         ];
 

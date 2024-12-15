@@ -37,8 +37,8 @@ class EloquentCartRepository implements CartRepositoryInterface
         $cartItemsData = $cart->getCartItems()->map(function (CartItem $item) {
             return [
                 'id' => (string) $item->id,
-                'cartId' => (string) $item->cartId,
-                'productId' => (string) $item->productId,
+                'cart_id' => (string) $item->cartId,
+                'product_id' => (string) $item->productId,
                 'quantity' => $item->quantity,
             ];
         })->toArray();

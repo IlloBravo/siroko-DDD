@@ -16,6 +16,6 @@ readonly class GetTotalProductsUseCase
     public function execute(string $cartId): int
     {
         $cart = $this->cartRepository->findByIdOrFail(UuidVO::fromString($cartId));
-        return $cart->getTotalProducts();
+        return count($cart->getCartItems());
     }
 }

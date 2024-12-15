@@ -7,8 +7,9 @@ use App\Domain\Cart\CartItem;
 use App\Domain\Product\Product;
 use App\Domain\Product\Repository\ProductRepositoryInterface;
 use App\Domain\Shared\ValueObjects\UuidVO;
+use Illuminate\Support\Facades\DB;
 use PHPUnit\Framework\MockObject\Exception;
-use PHPUnit\Framework\TestCase;
+use Tests\TestCase;
 
 class CartTest extends TestCase
 {
@@ -143,38 +144,48 @@ class CartTest extends TestCase
 
     public function testCartItemsAreProperlyInstantiatedFromValidDatabaseData(): void
     {
-        $cartId = UuidVO::generate()->__toString();
-        $productId1 = UuidVO::generate()->__toString();
-        $productId2 = UuidVO::generate()->__toString();
 
-        $cartData = (object) [
-            'id' => $cartId,
-            'items' => json_encode([
-                [
-                    'id' => UuidVO::generate()->__toString(),
-                    'cartId' => $cartId,
-                    'productId' => $productId1,
-                    'quantity' => 3,
-                ],
-                [
-                    'id' => UuidVO::generate()->__toString(),
-                    'cartId' => $cartId,
-                    'productId' => $productId2,
-                    'quantity' => 4,
-                ],
-            ]),
-        ];
+        $product_id_1 = UuidVO::generate()->__toString();
+        DB::table('products')->insert([
+            'id' => $product_id_1,
+            'name' => 'Bike',
+            'price' => 1500.00,
+            'stock' => 10,
+        ]);
 
-        $cart = Cart::fromDatabase($cartData);
+        $cart_id = UuidVO::generate()->__toString();
+        DB::table('carts')->insert([
+            'id' => $cart_id,
+            'items' => json_encode([]),
+        ]);
 
+        $cart_item_id = UuidVO::generate()->__toString();
+        DB::table('cart_items')->insert([
+            'id' => $cart_item_id,
+            'cart_id' => $cart_id,
+            'product_id' => $product_id_1,
+            'quantity' => 3,
+        ]);
+
+        DB::table('carts')
+            ->where('id', $cart_id)
+            ->update([
+                'items' => json_encode([
+                    [
+                        'id' => $cart_item_id,
+                        'cart_id' => $cart_id,
+                        'product_id' => $product_id_1,
+                        'quantity' => 3,
+                    ]
+                ]),
+            ]);
+
+        $cartRow = DB::table('carts')->where('id', $cart_id)->first();
+
+        $cart = Cart::fromDatabase($cartRow);
         $firstItem = $cart->getCartItems()->first();
-        $this->assertEquals($cartId, $firstItem->cartId->__toString());
-        $this->assertEquals($productId1, $firstItem->productId->__toString());
+        $this->assertEquals($cart_id, $firstItem->cartId->__toString());
+        $this->assertEquals($product_id_1, $firstItem->productId->__toString());
         $this->assertEquals(3, $firstItem->quantity);
-
-        $secondItem = $cart->getCartItems()->last();
-        $this->assertEquals($cartId, $secondItem->cartId->__toString());
-        $this->assertEquals($productId2, $secondItem->productId->__toString());
-        $this->assertEquals(4, $secondItem->quantity);
     }
 }

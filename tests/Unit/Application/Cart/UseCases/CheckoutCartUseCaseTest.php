@@ -4,51 +4,43 @@ namespace Tests\Unit\Application\Cart\UseCases;
 
 use App\Application\Cart\UseCases\CheckoutCartUseCase;
 use App\Domain\Cart\Cart;
-use App\Domain\Cart\Repository\CartRepositoryInterface;
-use App\Domain\Product\Product;
-use DateMalformedStringException;
-use PHPUnit\Framework\MockObject\Exception;
-use PHPUnit\Framework\TestCase;
-use Ramsey\Uuid\Uuid;
+use App\Domain\Shared\ValueObjects\UuidVO;
+use Tests\TestCase;
+use Tests\Traits\RepositoryMockTrait;
 
 class CheckoutCartUseCaseTest extends TestCase
 {
-    /**
-     * @throws DateMalformedStringException
-     * @throws Exception
-     */
+    use RepositoryMockTrait;
+
     public function testExecuteCheckoutCart(): void
     {
-        $cart = Cart::create([
-            'id' => Uuid::uuid4(),
+        $cartData = (object) [
+            'id' => UuidVO::generate()->__toString(),
             'items' => json_encode([]),
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
+        ];
+
+        $cart = Cart::fromDatabase($cartData);
 
         $productData = (object) [
-            'id' => '123e4567-e89b-12d3-a456-426614174001',
-            'name' => 'Producto B',
-            'price' => 30.0,
-            'quantity' => 20,
-            'cartQuantity' => 0,
+            'id' => UuidVO::generate()->__toString(),
+            'name' => 'Bike',
+            'price' => 1500.00,
+            'stock' => 10,
         ];
-        $product = Product::fromDatabase($productData);
 
-        $cart->addProduct($product, 3);
+        $cartItemData = (object) [
+            'id' => UuidVO::generate()->__toString(),
+            'cart_id' => $cartData->id,
+            'product_id' => $productData->id,
+            'quantity' => 3,
+        ];
 
-        $cartRepository = $this->createMock(CartRepositoryInterface::class);
-        $cartRepository->expects($this->once())
-            ->method('findByIdOrFail')
-            ->with($cart->id)
-            ->willReturn($cart);
-        $cartRepository->expects($this->once())
-            ->method('save')
-            ->with($cart);
+        $this->mockRepositories($productData, $cartData, $cartItemData);
 
-        $useCase = new CheckoutCartUseCase($cartRepository);
-        $useCase->execute($cart->id->__toString());
+        $useCase = app(CheckoutCartUseCase::class);
 
-        $this->assertEmpty($cart->items);
+        $useCase->execute($cartData->id);
+
+        $this->assertEmpty($cart->getCartItems());
     }
 }
